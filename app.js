@@ -1,32 +1,56 @@
 /**
  * Multi-Agent Healthcare Monitor Engine (JavaScript Web Application Mode)
- * Executes:
- * 1. Animated Lead II ECG Waveform Canvas
- * 2. Interactive Telemetry Sliders & Scenario Switcher
+ * Implements:
+ * 1. Interactive Patient Onboarding & Registration (Name, Age, Patient ID, Symptoms)
+ * 2. Real-Time Anatomical Organ Distress Scanner Animation
  * 3. 4 Core Multi-Agent Architectures (P2P, Blackboard, Parallel, Sequential Pipeline)
- * 4. ML Risk Scoring & Real-Time Agent Log Streaming
+ * 4. Patient AI Specialist Consultation & Q&A Portal (Tab 5)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     // State Management
     const state = {
-        patientId: 'PT-9042-ICU',
+        patient: {
+            name: 'Sarah Jenkins',
+            age: 58,
+            gender: 'Female',
+            id: 'PAT-2026-9042',
+            symptoms: 'Sudden onset chest tightness, difficulty breathing, and cold sweats.'
+        },
         vitals: {
-            heart_rate: 72,
-            spo2: 98,
-            systolic_bp: 120,
-            diastolic_bp: 78,
-            respiration_rate: 16,
-            body_temp: 36.8,
-            blood_glucose: 95,
-            troponin_level: 0.01
+            heart_rate: 148,
+            spo2: 89,
+            systolic_bp: 82,
+            diastolic_bp: 53,
+            respiration_rate: 28,
+            body_temp: 37.4,
+            blood_glucose: 185,
+            troponin_level: 2.15
         },
         activeArchTab: 'p2p',
-        currentScenario: 'stable'
+        currentScenario: 'cardiac'
     };
 
     // DOM Elements
     const elements = {
+        // Admission Modal & Form
+        admissionModal: document.getElementById('admissionModal'),
+        admissionForm: document.getElementById('admissionForm'),
+        openAdmissionBtn: document.getElementById('openAdmissionBtn'),
+        patientNameInput: document.getElementById('patientName'),
+        patientAgeInput: document.getElementById('patientAge'),
+        patientGenderInput: document.getElementById('patientGender'),
+        patientSymptomsInput: document.getElementById('patientSymptoms'),
+        modalScenarioPills: document.querySelectorAll('.scenario-pill'),
+
+        // Header Display Badges
+        dispPatientName: document.getElementById('disp-patient-name'),
+        dispPatientId: document.getElementById('disp-patient-id'),
+        dispPatientAge: document.getElementById('disp-patient-age'),
+        dispPatientSymptoms: document.getElementById('disp-patient-symptoms'),
+        sidebarSymptomsText: document.getElementById('sidebar-symptoms-text'),
+        chatPatientName: document.getElementById('chat-patient-name'),
+
         // Sliders
         sliderHr: document.getElementById('slider-hr'),
         sliderSpo2: document.getElementById('slider-spo2'),
@@ -36,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sliderGlucose: document.getElementById('slider-glucose'),
         sliderTroponin: document.getElementById('slider-troponin'),
 
-        // Slider Labels
+        // Slider Value Labels
         valHr: document.getElementById('val-hr'),
         valSpo2: document.getElementById('val-spo2'),
         valSbp: document.getElementById('val-sbp'),
@@ -45,20 +69,30 @@ document.addEventListener('DOMContentLoaded', () => {
         valGlucose: document.getElementById('val-glucose'),
         valTroponin: document.getElementById('val-troponin'),
 
-        // Telemetry Cards & Canvas
+        // Vital Cards
+        cardHr: document.getElementById('card-hr'),
+        cardSpo2: document.getElementById('card-spo2'),
+        cardBp: document.getElementById('card-bp'),
+        cardTemp: document.getElementById('card-temp'),
         cardValHr: document.getElementById('card-val-hr'),
         cardValSpo2: document.getElementById('card-val-spo2'),
         cardValBp: document.getElementById('card-val-bp'),
         cardValTemp: document.getElementById('card-val-temp'),
-        ecgBpmReadout: document.getElementById('ecg-bpm-readout'),
-        ecgCanvas: document.getElementById('ecgCanvas'),
 
-        // Header Badges
+        // Organ Scanner Nodes
+        organHeart: document.getElementById('organ-heart'),
+        organLungs: document.getElementById('organ-lungs'),
+        organPancreas: document.getElementById('organ-pancreas'),
+        organBrain: document.getElementById('organ-brain'),
+        tagHeart: document.getElementById('tag-heart'),
+        tagLungs: document.getElementById('tag-lungs'),
+        tagPancreas: document.getElementById('tag-pancreas'),
+        tagBrain: document.getElementById('tag-brain'),
+        organScannerStatus: document.getElementById('organ-scanner-status'),
+
+        // Status Badges & ML Box
         triageStatusBadge: document.getElementById('triage-status-badge'),
-        emergencyAlertBadge: document.getElementById('emergency-alert-badge'),
         activeArchBadge: document.getElementById('active-arch-badge'),
-
-        // ML Prediction Panel
         mlRiskResult: document.getElementById('ml-risk-result'),
         mlConfidence: document.getElementById('ml-confidence'),
         pbar0: document.getElementById('pbar-0'),
@@ -71,111 +105,87 @@ document.addEventListener('DOMContentLoaded', () => {
         runAgentsBtn: document.getElementById('run-agents-btn'),
         clearConsoleBtn: document.getElementById('clear-console-btn'),
 
-        // Tabs & Feeds
+        // Tabs & Q&A
         tabBtns: document.querySelectorAll('.tab-btn'),
         tabPanes: document.querySelectorAll('.tab-pane'),
-        scenarioBtns: document.querySelectorAll('.scenario-btn'),
         p2pMsgFeed: document.getElementById('p2p-msg-feed'),
         blackboardBody: document.getElementById('blackboard-entries-body'),
-        bbAlertFlag: document.getElementById('bb-alert-flag')
+        bbAlertFlag: document.getElementById('bb-alert-flag'),
+        qaForm: document.getElementById('qaForm'),
+        qaInput: document.getElementById('qaInput'),
+        qaChatWindow: document.getElementById('qaChatWindow'),
+        chipBtns: document.querySelectorAll('.chip-btn')
     };
 
     // ==========================================
-    // 1. ANIMATED ECG WAVEFORM CANVAS RENDERER
+    // 1. PATIENT ADMISSION & REGISTRATION FLOW
     // ==========================================
-    const canvas = elements.ecgCanvas;
-    const ctx = canvas.getContext('2d');
-    let animationFrameId;
-    let ecgX = 0;
-    const ecgBuffer = new Array(800).fill(45);
-
-    function resizeCanvas() {
-        if (canvas) {
-            canvas.width = canvas.parentElement.clientWidth - 24;
-            canvas.height = 90;
-        }
+    function generatePatientID() {
+        const randNum = Math.floor(1000 + Math.random() * 9000);
+        return `PAT-2026-${randNum}`;
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
 
-    function drawECGWave() {
-        if (!canvas) return;
-        ctx.fillStyle = '#060b13';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    elements.openAdmissionBtn.addEventListener('click', () => {
+        elements.admissionModal.classList.add('active');
+    });
 
-        // Draw background grid lines
-        ctx.strokeStyle = 'rgba(16, 185, 129, 0.08)';
-        ctx.lineWidth = 1;
-        for (let x = 0; x < canvas.width; x += 20) {
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, canvas.height);
-            ctx.stroke();
-        }
-        for (let y = 0; y < canvas.height; y += 20) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(canvas.width, y);
-            ctx.stroke();
-        }
+    elements.modalScenarioPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            elements.modalScenarioPills.forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            state.currentScenario = pill.getAttribute('data-scenario');
+        });
+    });
 
-        // Generate ECG P-Q-R-S-T points based on Heart Rate
-        const hr = state.vitals.heart_rate;
-        const period = Math.max(20, Math.floor(6000 / hr));
-        const cyclePos = ecgX % period;
-        let yVal = 45;
+    elements.admissionForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        state.patient.name = elements.patientNameInput.value.trim() || 'John Doe';
+        state.patient.age = parseInt(elements.patientAgeInput.value) || 50;
+        state.patient.gender = elements.patientGenderInput.value;
+        state.patient.symptoms = elements.patientSymptomsInput.value.trim() || 'Chest tightness and shortness of breath';
+        state.patient.id = generatePatientID();
 
-        if (cyclePos === Math.floor(period * 0.15)) yVal = 38; // P wave
-        else if (cyclePos === Math.floor(period * 0.30)) yVal = 50; // Q wave
-        else if (cyclePos === Math.floor(period * 0.35)) yVal = 10; // R peak
-        else if (cyclePos === Math.floor(period * 0.40)) yVal = 75; // S wave
-        else if (cyclePos === Math.floor(period * 0.60)) yVal = 35; // T wave
-        else yVal = 45 + (Math.random() * 2 - 1); // Baseline noise
+        // Update UI displays
+        elements.dispPatientName.innerText = state.patient.name;
+        elements.dispPatientId.innerText = state.patient.id;
+        elements.dispPatientAge.innerText = `Age ${state.patient.age} (${state.patient.gender})`;
+        elements.dispPatientSymptoms.innerText = state.patient.symptoms.substring(0, 30) + '...';
+        elements.sidebarSymptomsText.innerText = state.patient.symptoms;
+        if (elements.chatPatientName) elements.chatPatientName.innerText = state.patient.name;
 
-        ecgBuffer[ecgX % canvas.width] = yVal;
-        ecgX++;
+        // Apply selected scenario presets
+        applyScenarioPreset(state.currentScenario);
 
-        // Draw waveform
-        ctx.strokeStyle = '#10b981';
-        ctx.lineWidth = 2;
-        ctx.shadowColor = '#10b981';
-        ctx.shadowBlur = 6;
-        ctx.beginPath();
+        // Hide Modal
+        elements.admissionModal.classList.remove('active');
+        logConsole(`\n[HOSPITAL ADMISSION] Confirmed Patient ID: ${state.patient.id} for ${state.patient.name}, Age ${state.patient.age}.`, 'log-alert');
+    });
 
-        for (let i = 0; i < canvas.width; i++) {
-            const val = ecgBuffer[i];
-            if (i === 0) ctx.moveTo(i, val);
-            else ctx.lineTo(i, val);
-        }
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-
-        animationFrameId = requestAnimationFrame(drawECGWave);
-    }
-    drawECGWave();
-
-    // ==========================================
-    // 2. SCENARIOS & SLIDERS SYNC
-    // ==========================================
-    const presetScenarios = {
-        stable: {
-            heart_rate: 72, spo2: 98, systolic_bp: 120, respiration_rate: 16,
-            body_temp: 36.8, blood_glucose: 95, troponin_level: 0.01
-        },
-        cardiac: {
-            heart_rate: 148, spo2: 89, systolic_bp: 82, respiration_rate: 28,
-            body_temp: 37.4, blood_glucose: 185, troponin_level: 2.15
-        },
-        sepsis: {
-            heart_rate: 135, spo2: 85, systolic_bp: 78, respiration_rate: 34,
-            body_temp: 40.2, blood_glucose: 280, troponin_level: 0.45
-        },
-        hypoxia: {
-            heart_rate: 115, spo2: 78, systolic_bp: 145, respiration_rate: 38,
-            body_temp: 38.1, blood_glucose: 140, troponin_level: 0.08
-        }
+    const scenarioPresets = {
+        cardiac: { heart_rate: 148, spo2: 89, systolic_bp: 82, respiration_rate: 28, body_temp: 37.4, blood_glucose: 185, troponin_level: 2.15 },
+        sepsis: { heart_rate: 135, spo2: 85, systolic_bp: 78, respiration_rate: 34, body_temp: 40.2, blood_glucose: 280, troponin_level: 0.45 },
+        hypoxia: { heart_rate: 115, spo2: 78, systolic_bp: 145, respiration_rate: 38, body_temp: 38.1, blood_glucose: 140, troponin_level: 0.08 },
+        stable: { heart_rate: 72, spo2: 98, systolic_bp: 120, respiration_rate: 16, body_temp: 36.8, blood_glucose: 95, troponin_level: 0.01 }
     };
 
+    function applyScenarioPreset(scKey) {
+        const data = scenarioPresets[scKey];
+        if (data) {
+            elements.sliderHr.value = data.heart_rate;
+            elements.sliderSpo2.value = data.spo2;
+            elements.sliderSbp.value = data.systolic_bp;
+            elements.sliderRr.value = data.respiration_rate;
+            elements.sliderTemp.value = data.body_temp;
+            elements.sliderGlucose.value = data.blood_glucose;
+            elements.sliderTroponin.value = data.troponin_level;
+            updateVitalsFromUI();
+        }
+    }
+
+    // ==========================================
+    // 2. LIVE REAL-TIME TELEMETRY & ORGAN SCANNER
+    // ==========================================
     function updateVitalsFromUI() {
         state.vitals.heart_rate = parseFloat(elements.sliderHr.value);
         state.vitals.spo2 = parseFloat(elements.sliderSpo2.value);
@@ -186,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.vitals.blood_glucose = parseFloat(elements.sliderGlucose.value);
         state.vitals.troponin_level = parseFloat(elements.sliderTroponin.value);
 
-        // Update Labels
+        // Slider Labels
         elements.valHr.innerText = `${state.vitals.heart_rate} bpm`;
         elements.valSpo2.innerText = `${state.vitals.spo2} %`;
         elements.valSbp.innerText = `${state.vitals.systolic_bp} mmHg`;
@@ -195,47 +205,87 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.valGlucose.innerText = `${state.vitals.blood_glucose} mg/dL`;
         elements.valTroponin.innerText = `${state.vitals.troponin_level} ng/mL`;
 
-        // Update Cards & ECG Readout
+        // Vital Cards Display
         elements.cardValHr.innerText = state.vitals.heart_rate;
         elements.cardValSpo2.innerText = state.vitals.spo2;
         elements.cardValBp.innerText = `${state.vitals.systolic_bp}/${state.vitals.diastolic_bp}`;
         elements.cardValTemp.innerText = state.vitals.body_temp;
-        elements.ecgBpmReadout.innerText = `${state.vitals.heart_rate} BPM`;
 
-        // Run immediate lightweight risk calculation
+        // Card Glow Animations
+        elements.cardHr.className = `vital-card ${state.vitals.heart_rate > 120 || state.vitals.troponin_level > 0.1 ? 'card-pulse-danger' : ''}`;
+        elements.cardSpo2.className = `vital-card ${state.vitals.spo2 < 90 ? 'card-pulse-danger' : (state.vitals.spo2 < 95 ? 'card-pulse-warning' : '')}`;
+        elements.cardBp.className = `vital-card ${state.vitals.systolic_bp < 90 || state.vitals.systolic_bp > 160 ? 'card-pulse-danger' : ''}`;
+
+        // Update Organ Scanner Animation
+        updateOrganScanner();
+
+        // Evaluate ML Risk Model
         evaluateMLModel();
     }
 
-    // Slider Event Listeners
+    function updateOrganScanner() {
+        const v = state.vitals;
+        let targetedOrgans = [];
+
+        // Heart Node
+        if (v.heart_rate > 120 || v.troponin_level > 0.1 || v.systolic_bp < 90) {
+            elements.organHeart.className = 'organ-node active-organ';
+            elements.tagHeart.className = 'organ-tag tag-critical';
+            elements.tagHeart.innerText = v.troponin_level > 0.1 ? 'ISCHEMIA RISK' : 'TACHYCARDIA';
+            targetedOrgans.push('Heart');
+        } else {
+            elements.organHeart.className = 'organ-node';
+            elements.tagHeart.className = 'organ-tag tag-normal';
+            elements.tagHeart.innerText = 'NORMAL';
+        }
+
+        // Lungs Node
+        if (v.spo2 < 92 || v.respiration_rate > 24) {
+            elements.organLungs.className = 'organ-node active-organ';
+            elements.tagLungs.className = 'organ-tag tag-urgent';
+            elements.tagLungs.innerText = v.spo2 < 88 ? 'SEVERE HYPOXIA' : 'RESP DISTRESS';
+            targetedOrgans.push('Lungs');
+        } else {
+            elements.organLungs.className = 'organ-node';
+            elements.tagLungs.className = 'organ-tag tag-normal';
+            elements.tagLungs.innerText = 'PERFUSED';
+        }
+
+        // Metabolic / Glucose Node
+        if (v.blood_glucose > 200 || v.body_temp > 39.0) {
+            elements.organPancreas.className = 'organ-node active-organ';
+            elements.tagPancreas.className = 'organ-tag tag-urgent';
+            elements.tagPancreas.innerText = v.blood_glucose > 200 ? 'HYPERGLYCEMIC' : 'FEVER SPIKE';
+            targetedOrgans.push('Metabolic');
+        } else {
+            elements.organPancreas.className = 'organ-node';
+            elements.tagPancreas.className = 'organ-tag tag-normal';
+            elements.tagPancreas.innerText = 'STABLE';
+        }
+
+        // Brain Node
+        if (v.systolic_bp < 85 || v.spo2 < 82) {
+            elements.organBrain.className = 'organ-node active-organ';
+            elements.tagBrain.className = 'organ-tag tag-critical';
+            elements.tagBrain.innerText = 'HYPOPERFUSION';
+            targetedOrgans.push('Brain');
+        } else {
+            elements.organBrain.className = 'organ-node';
+            elements.tagBrain.className = 'organ-tag tag-normal';
+            elements.tagBrain.innerText = 'PERFUSED';
+        }
+
+        elements.organScannerStatus.innerText = targetedOrgans.length > 0 ? `Distress: ${targetedOrgans.join(', ')}` : 'Systemic Baseline Normal';
+    }
+
+    // Attach slider listeners
     [elements.sliderHr, elements.sliderSpo2, elements.sliderSbp, elements.sliderRr,
      elements.sliderTemp, elements.sliderGlucose, elements.sliderTroponin].forEach(slider => {
         slider.addEventListener('input', updateVitalsFromUI);
     });
 
-    // Scenario Button Listeners
-    elements.scenarioBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            elements.scenarioBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            const scKey = btn.getAttribute('data-scenario');
-            const data = presetScenarios[scKey];
-            if (data) {
-                elements.sliderHr.value = data.heart_rate;
-                elements.sliderSpo2.value = data.spo2;
-                elements.sliderSbp.value = data.systolic_bp;
-                elements.sliderRr.value = data.respiration_rate;
-                elements.sliderTemp.value = data.body_temp;
-                elements.sliderGlucose.value = data.blood_glucose;
-                elements.sliderTroponin.value = data.troponin_level;
-                updateVitalsFromUI();
-                logConsole(`[SYS] Loaded preset clinical scenario: '${scKey.toUpperCase()}'.`);
-            }
-        });
-    });
-
     // ==========================================
-    // 3. ML MODEL EVALUATOR SIMULATOR
+    // 3. ML MODEL RISK EVALUATOR
     // ==========================================
     function evaluateMLModel() {
         const v = state.vitals;
@@ -267,11 +317,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         elements.mlRiskResult.innerText = riskLabel;
+        elements.mlRiskResult.className = `pred-result ${score >= 7 ? 'status-critical-text' : ''}`;
+
         elements.triageStatusBadge.innerText = riskLabel;
         elements.triageStatusBadge.className = `pill-status ${triageClass}`;
-
-        elements.emergencyAlertBadge.innerText = score >= 4 ? "CODE RED ALERT" : "STABLE";
-        elements.emergencyAlertBadge.className = `pill-status alert-pill ${score >= 4 ? 'status-critical' : 'status-standby'}`;
 
         elements.pbar0.style.width = `${probs[0]}%`;
         elements.pbar1.style.width = `${probs[1]}%`;
@@ -282,10 +331,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. MULTI-AGENT ARCHITECTURES SIMULATORS
+    // 4. MULTI-AGENT ARCHITECTURES SIMULATOR
     // ==========================================
-
-    // Tab Switcher
     elements.tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             elements.tabBtns.forEach(b => b.classList.remove('active'));
@@ -300,25 +347,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Architecture 1: P2P Agent Simulator
     function runP2PSimulation() {
         const v = state.vitals;
         elements.p2pMsgFeed.innerHTML = '';
 
         const logs = [];
-        logs.push(`[P2P Mesh Initialized] 3 Specialist Agents connected (Pulmonologist, Cardiologist, Endocrinologist).`);
+        logs.push(`[P2P Specialist Mesh Active] Pulmonologist, Cardiologist, Endocrinologist initialized.`);
 
         if (v.spo2 < 90) {
-            logs.push(`[PulmonologistAgent -> CardiologistAgent]: "Alert: SpO2 dropped to ${v.spo2}%. Is ischemic cardiac compensation required?"`);
+            logs.push(`[Pulmonologist -> Cardiologist]: "Patient ${state.patient.name} has severe hypoxia SpO2=${v.spo2}%. Check cardiac output."`);
         }
         if (v.heart_rate > 120 || v.troponin_level > 0.1) {
-            logs.push(`[CardiologistAgent -> EndocrinologistAgent]: "Tachycardia & elevated Troponin (${v.troponin_level} ng/mL). Check metabolic drive!"`);
+            logs.push(`[Cardiologist -> Endocrinologist]: "Elevated Troponin ${v.troponin_level} ng/mL & HR ${v.heart_rate} bpm. Assess metabolic shock risk."`);
         }
         if (v.blood_glucose > 200) {
-            logs.push(`[EndocrinologistAgent -> PulmonologistAgent]: "Glucose spike ${v.blood_glucose} mg/dL. Hyperglycemic metabolic acidosis risk evaluated."`);
+            logs.push(`[Endocrinologist -> Pulmonologist]: "Hyperglycemia ${v.blood_glucose} mg/dL detected. Monitor respiratory compensation."`);
         }
         if (logs.length === 1) {
-            logs.push(`[P2P Negotiation]: All specialist agents report normal physiology across cardiac, pulmonary, and endocrine channels.`);
+            logs.push(`[P2P Negotiation]: All specialist agents report normal vital baseline for ${state.patient.name}.`);
         }
 
         logs.forEach(logText => {
@@ -330,14 +376,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Architecture 2: Blackboard Architecture Simulator
     function runBlackboardSimulation() {
         const v = state.vitals;
         elements.blackboardBody.innerHTML = '';
         const now = new Date().toLocaleTimeString();
 
         const entries = [
-            { time: now, agent: 'VitalIngestionKS', cat: 'TELEMETRY', data: `Ingested SpO2=${v.spo2}%, HR=${v.heart_rate} bpm, BP=${v.systolic_bp} mmHg.` }
+            { time: now, agent: 'VitalIngestionKS', cat: 'TELEMETRY', data: `Patient ${state.patient.name}: Ingested SpO2=${v.spo2}%, HR=${v.heart_rate} bpm, BP=${v.systolic_bp} mmHg.` }
         ];
 
         let alertLevel = 'GREEN - STABLE';
@@ -346,12 +391,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (v.troponin_level > 0.1 || (v.heart_rate > 130 && v.systolic_bp < 90)) {
             alertLevel = 'RED - CRITICAL CARDIAC EMERGENCY';
             alertClass = 'red';
-            entries.push({ time: now, agent: 'CardiacEvaluatorKS', cat: 'CRITICAL_ALERT', data: `HYPOTHESIS: Severe Ischemia / Cardiogenic Shock. Troponin=${v.troponin_level} ng/mL.` });
+            entries.push({ time: now, agent: 'CardiacEvaluatorKS', cat: 'CRITICAL_ALERT', data: `HYPOTHESIS: High Cardiac Ischemia Risk. Troponin=${v.troponin_level} ng/mL.` });
         }
         if (v.spo2 < 88) {
             alertLevel = 'RED - RESPIRATORY CRISIS';
             alertClass = 'red';
-            entries.push({ time: now, agent: 'RespiratoryEvaluatorKS', cat: 'CRITICAL_ALERT', data: `HYPOTHESIS: Acute Respiratory Distress (SpO2=${v.spo2}%).` });
+            entries.push({ time: now, agent: 'RespiratoryEvaluatorKS', cat: 'CRITICAL_ALERT', data: `HYPOTHESIS: Severe Hypoxic Respiratory Distress (SpO2=${v.spo2}%).` });
         }
 
         elements.bbAlertFlag.innerText = alertLevel;
@@ -365,12 +410,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Architecture 3: Parallel Execution Simulator
     function runParallelSimulation() {
         const v = state.vitals;
-        const latCardio = (Math.random() * 3 + 2).toFixed(2);
-        const latResp = (Math.random() * 3 + 2).toFixed(2);
-        const latMetabolic = (Math.random() * 3 + 2).toFixed(2);
+        const latCardio = (Math.random() * 2 + 1.5).toFixed(2);
+        const latResp = (Math.random() * 2 + 1.5).toFixed(2);
+        const latMetabolic = (Math.random() * 2 + 1.5).toFixed(2);
 
         document.getElementById('lat-cardio').innerText = `${latCardio} ms`;
         document.getElementById('lat-resp').innerText = `${latResp} ms`;
@@ -392,10 +436,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxLat = Math.max(latCardio, latResp, latMetabolic);
         document.getElementById('total-parallel-time').innerText = `${maxLat} ms (Concurrent Thread Execution)`;
 
-        logConsole(`[Parallel Execution] 3 Sensor Workers completed in ${maxLat} ms. Cardio: ${statCardio}, Resp: ${statResp}, Metabolic: ${statMetabolic}.`, 'log-par');
+        logConsole(`[Parallel Execution] 3 Worker Agents processed telemetry in ${maxLat} ms. Cardio: ${statCardio}, Resp: ${statResp}.`, 'log-par');
     }
 
-    // Architecture 4: Sequential Pipeline Simulator
     function runSequentialSimulation() {
         const v = state.vitals;
         const steps = ['step-1', 'step-2', 'step-3', 'step-4', 'step-5'];
@@ -408,30 +451,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 elem.classList.add('active-step');
 
                 if (stepId === 'step-1') {
-                    document.getElementById('p-step-1').innerText = `Ingested ${Object.keys(v).length} vital telemetry parameters cleanly.`;
+                    document.getElementById('p-step-1').innerText = `Validating telemetry stream for ${state.patient.name}...`;
                 } else if (stepId === 'step-2') {
                     const shockIdx = (v.heart_rate / Math.max(v.systolic_bp, 1)).toFixed(2);
-                    document.getElementById('p-step-2').innerText = `Computed Shock Index: ${shockIdx} (Normal: 0.5 - 0.7).`;
+                    document.getElementById('p-step-2').innerText = `Shock Index: ${shockIdx} (Normal: 0.5 - 0.7).`;
                 } else if (stepId === 'step-3') {
                     const evalRes = evaluateMLModel();
-                    document.getElementById('p-step-3').innerText = `RandomForest Prediction: ${evalRes.riskLabel}.`;
+                    document.getElementById('p-step-3').innerText = `ML Prediction: ${evalRes.riskLabel}.`;
                 } else if (stepId === 'step-4') {
                     const evalRes = evaluateMLModel();
-                    document.getElementById('p-step-4').innerText = `ESI Triage Priority: ${evalRes.score >= 4 ? 'Level 1 Immediate ICU' : 'Level 4 Routine Monitor'}.`;
+                    document.getElementById('p-step-4').innerText = `Triage: ${evalRes.score >= 4 ? 'Priority 1 - Immediate ICU' : 'Priority 4 - Floor Monitoring'}.`;
                 } else if (stepId === 'step-5') {
                     const evalRes = evaluateMLModel();
-                    document.getElementById('p-step-5').innerText = evalRes.score >= 4 ? 'Alert Dispatched: Rapid Response Crash Team!' : 'Telemetry logged to EHR.';
+                    document.getElementById('p-step-5').innerText = evalRes.score >= 4 ? 'Alert Dispatched: ICU Crash Team!' : 'Telemetry logged to EHR.';
                 }
 
                 logConsole(`[Sequential Pipeline] Step ${idx + 1} completed: ${elem.querySelector('h4').innerText}`, 'log-seq');
             }, delay);
-            delay += 250;
+            delay += 200;
         });
     }
 
-    // Trigger Button Click Listener
     elements.runAgentsBtn.addEventListener('click', () => {
-        logConsole(`\n--- TRIGGERING MULTI-AGENT EVALUATION ACROSS ALL ARCHITECTURES ---`, 'log-alert');
+        logConsole(`\n--- EVALUATING PATIENT ${state.patient.name.toUpperCase()} (${state.patient.id}) ---`, 'log-alert');
         evaluateMLModel();
         runP2PSimulation();
         runBlackboardSimulation();
@@ -439,7 +481,64 @@ document.addEventListener('DOMContentLoaded', () => {
         runSequentialSimulation();
     });
 
-    // Console Logging Utility
+    // ==========================================
+    // 5. PATIENT AI CONSULTATION & Q&A PORTAL (TAB 5)
+    // ==========================================
+    function handlePatientQuestion(questionText) {
+        if (!questionText.trim()) return;
+
+        // 1. Append User Message
+        appendChatMessage(state.patient.name, questionText, 'user-bubble');
+        elements.qaInput.value = '';
+
+        // 2. Generate Multi-Agent Specialist Guidance
+        const v = state.vitals;
+        setTimeout(() => {
+            let responseText = "";
+            const lowerQ = questionText.toLowerCase();
+
+            if (lowerQ.includes('troponin') || lowerQ.includes('heart') || lowerQ.includes('chest')) {
+                responseText = `[CardiologistAgent & PulmonologistAgent]: Your current troponin level is ${v.troponin_level} ng/mL (Normal < 0.04 ng/mL) and heart rate is ${v.heart_rate} bpm. Elevated troponin indicates heart muscle stress or ischemia. Because you reported "${state.patient.symptoms}", our multi-agent triage system has notified the attending physician for immediate cardiac assessment.`;
+            } else if (lowerQ.includes('spo2') || lowerQ.includes('oxygen') || lowerQ.includes('breath')) {
+                responseText = `[PulmonologistAgent]: Your oxygen saturation (SpO2) is currently ${v.spo2}% with a respiration rate of ${v.respiration_rate} breaths/min. Values below 90% indicate hypoxemic distress. High-flow supplemental oxygen therapy is recommended.`;
+            } else if (lowerQ.includes('glucose') || lowerQ.includes('sugar') || lowerQ.includes('fever')) {
+                responseText = `[EndocrinologistAgent]: Your blood glucose is ${v.blood_glucose} mg/dL and temperature is ${v.body_temp} °C. High blood sugar can occur during acute physical stress. Our agents are continuously monitoring your metabolic stability.`;
+            } else {
+                responseText = `[Multi-Agent Specialist Panel]: Based on your live telemetry (HR: ${v.heart_rate} bpm, SpO2: ${v.spo2}%, BP: ${v.systolic_bp} mmHg) and complaints of "${state.patient.symptoms}", our P2P specialist agents are continuously cross-referencing your organs for optimal treatment. Please rest while your medical team evaluates your progress.`;
+            }
+
+            appendChatMessage("Multi-Agent Medical Panel", responseText, 'bot-bubble');
+            logConsole(`[Patient Q&A] Answered patient query regarding: "${questionText.substring(0, 30)}..."`, 'log-p2p');
+        }, 400);
+    }
+
+    function appendChatMessage(sender, text, bubbleClass) {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${bubbleClass}`;
+        bubble.innerHTML = `
+            <div class="bubble-header">
+                <i class="fa-solid ${bubbleClass === 'user-bubble' ? 'fa-user' : 'fa-user-doctor'}"></i>
+                <span>${sender}</span>
+            </div>
+            <p>${text}</p>
+        `;
+        elements.qaChatWindow.appendChild(bubble);
+        elements.qaChatWindow.scrollTop = elements.qaChatWindow.scrollHeight;
+    }
+
+    elements.qaForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handlePatientQuestion(elements.qaInput.value);
+    });
+
+    elements.chipBtns.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const q = chip.getAttribute('data-question');
+            handlePatientQuestion(q);
+        });
+    });
+
+    // Console Utilities
     function logConsole(text, cssClass = 'log-sys') {
         const div = document.createElement('div');
         div.className = `log-entry ${cssClass}`;
@@ -450,10 +549,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     elements.clearConsoleBtn.addEventListener('click', () => {
         elements.consoleLogs.innerHTML = '';
-        logConsole('[SYS] Console logs cleared.');
+        logConsole('[SYS] Log console cleared.');
     });
 
     // Initial setup call
     updateVitalsFromUI();
-    logConsole('[SYS] Multi-Agent Healthcare Monitor Dashboard loaded successfully.');
+    logConsole(`[SYS] Healthcare Monitor & Patient Portal initialized for ${state.patient.name}.`);
 });
