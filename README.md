@@ -1,71 +1,49 @@
-# 🏥 Multi-Agent Healthcare Monitor
+# 🏥 AGENTIC-AI MULTI AGENT HEALTH CARE MONITOR
 
-An advanced Agentic AI system designed for real-time patient vital monitoring, clinical triage, and emergency response across four foundational multi-agent software architectures: **Peer-to-Peer (P2P)**, **Blackboard Shared Memory**, **Parallel Execution**, and **Sequential Pipeline**.
+An advanced Agentic AI system and Machine Learning training studio for real-time patient vital monitoring, clinical triage, and emergency response across four foundational multi-agent software architectures: **Peer-to-Peer (P2P)**, **Blackboard Shared Memory**, **Parallel Async Execution**, and **Sequential Pipeline**.
 
 ---
 
 ## 🌟 Key Features & Architecture Breakdown
 
-### 1. Peer-to-Peer (P2P) Architecture
-- **Concept**: Specialist medical agents (**Cardiologist**, **Pulmonologist**, **Endocrinologist**) directly exchange structured message objects over peer queues without a centralized master node.
-- **Use Case**: Multi-organ pathology resolution (e.g. cross-referencing hypoxemia from Pulmonology with cardiac strain in Cardiology and glucose spike in Endocrinology).
+### 1. Training Dataset & ML Fine-Tuning Studio (Tab 6)
+- **5,000 Patient Synthetic Dataset**: View, search, filter, and inspect training records across 9 clinical vital sign features (`Heart Rate`, `SpO2`, `Systolic BP`, `Diastolic BP`, `Respiration Rate`, `Body Temp`, `Blood Glucose`, `Troponin Level`, `Age`).
+- **One-Click CSV Export**: Download the complete 5,000-sample dataset directly from the web interface.
+- **Interactive Model Retraining**: Adjust hyperparameters (`Estimators / Trees`, `Max Depth`, `Train/Test Ratio`, `Random Seed`) and retrain the Random Forest ML model with real-time accuracy updates, 4x4 confusion matrix grid, and feature importance bar meters.
 
-### 2. Blackboard Shared Memory Architecture
-- **Concept**: A central, thread-safe memory store (`Blackboard`) holding raw patient telemetry, active hypothesis entries, and global emergency status.
-- **Use Case**: Asynchronous hypothesis posting by independent **Knowledge Source (KS)** agents (e.g. `VitalIngestionKS`, `CardiacEvaluatorKS`, `RespiratoryEvaluatorKS`).
+### 2. Autonomous Agentic AI Tool-Calling Engine (ReAct Framework)
+- The AI Agent operates using a **Perceive ➔ Thought ➔ Tool Call ➔ Act ➔ Reflect** loop:
+  - `dataset_stats_lookup`: Queries historical vital benchmarks in the 5,000-patient dataset.
+  - `compute_shock_index`: Computes Shock Index ($HR / SBP$) & Pulse Pressure.
+  - `predict_risk_ml`: Runs trained Random Forest ML decision paths.
+  - `organ_pathology_evaluator`: Evaluates organ distress across Heart, Lungs, Pancreas/Metabolic, Brain.
+  - `subagent_specialist_consult`: Dispatches sub-agent mesh (Cardiology, Pulmonology, Endocrinology).
+  - `dispatch_clinical_triage`: Issues priority level and dispatches hospital alerts.
 
-### 3. Parallel Execution Architecture
-- **Concept**: Concurrent async worker agents (`Cardiovascular Worker`, `Respiratory Worker`, `Metabolic & Lab Worker`) execute across parallel CPU threads.
-- **Use Case**: High-frequency streaming telemetry processing achieving sub-millisecond anomaly detection.
-
-### 4. Sequential / Pipeline Architecture
-- **Concept**: Structured 5-stage processing pipeline:
-  1. `Telemetry Ingestion Stage` (Validates vital streams)
-  2. `Feature Engineering Stage` (Computes Shock Index & Pulse Pressure)
-  3. `ML Risk Scoring Stage` (Random Forest Classifier inference)
-  4. `Clinical Triage Stage` (Assigns Emergency Severity Index triage category)
-  5. `Action Dispatch Stage` (Issues hospital code red / ICU transfer dispatch)
-
----
-
-## 🧠 Machine Learning Engine
-
-- **Synthetic Dataset**: 5,000 multi-parameter patient vital sign records across 4 clinical states:
-  - `0`: Normal Baseline
-  - `1`: Mild Distress
-  - `2`: Urgent ICU Care
-  - `3`: Critical Emergency (Cardiogenic / Septic Shock)
-- **Model**: Scikit-Learn **Random Forest Classifier** trained with strict featurization split before scaling, achieving **100% classification accuracy**.
-- **Top Feature Weights**: Troponin level (26.5%), Blood glucose (17.6%), Body temperature (15.6%), Respiration rate (9.8%).
+### 3. 4 Core Multi-Agent Architectures
+- **Peer-to-Peer (P2P)**: Specialist agents negotiate directly over message queues.
+- **Blackboard Shared Memory**: Central shared memory updated asynchronously by knowledge sources.
+- **Parallel Async Execution**: Multi-channel worker agents process telemetry concurrently with sub-millisecond latency.
+- **Sequential Pipeline**: Deterministic 5-stage processing pipeline.
 
 ---
 
 ## 🚀 How to Run
 
-### Option A: Google Colab Notebook Mode
-1. Open [Google Colab](https://colab.research.google.com/).
-2. Upload `Healthcare_MultiAgent_Monitor.ipynb`.
-3. Click **Runtime -> Run all**.
-4. Explore dataset generation, ML model training metrics, confusion matrix plots, and live execution logs for all 4 multi-agent architectures.
-
-### Option B: Local Python Engine Script
+### Option A: Python REST Server & Web App Mode (Recommended)
 ```bash
 # Clone/Navigate to workspace
 cd "e:/AGENTIC AI"
 
-# Run Python script
+# Run Python REST Server (Serves Web Dashboard + API on http://localhost:8080)
+python server.py
+```
+- Open your browser at: `http://localhost:8080`
+
+### Option B: Local Engine Script
+```bash
 python ml_agent_engine.py
 ```
-
-### Option C: Web Application UI Mode (Interactive Dashboard)
-```bash
-# Launch HTTP server
-python -m http.server 8080
-
-# Open browser at:
-http://localhost:8080
-```
-- **Features**: Live Lead II ECG Waveform canvas animation, preset clinical scenario buttons (*Stable Baseline*, *Cardiac Distress*, *Septic Shock*, *Hypoxemic Crisis*), telemetry sliders, interactive multi-agent architecture explorer tabs, and real-time execution log console.
 
 ---
 
@@ -73,9 +51,10 @@ http://localhost:8080
 
 ```
 e:/AGENTIC AI/
-├── Healthcare_MultiAgent_Monitor.ipynb # Self-contained Google Colab Notebook
-├── ml_agent_engine.py                  # Core Python ML & Multi-Agent Engine
-├── index.html                           # Web Dashboard HTML5 layout
+├── Healthcare_MultiAgent_Monitor.ipynb # Google Colab Notebook
+├── ml_agent_engine.py                  # Core Python ML & Agentic Engine
+├── server.py                           # Python HTTP REST Backend Server (Port 8080)
+├── index.html                          # Web Dashboard HTML5 layout
 ├── styles.css                          # Dark Glassmorphism CSS design system
 ├── app.js                              # Web Application interactive logic engine
 └── README.md                           # Project documentation

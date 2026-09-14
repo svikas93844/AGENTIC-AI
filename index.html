@@ -3,554 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Agent Healthcare Monitor & Patient Portal</title>
+    <title>AGENTIC-AI MULTI AGENT HEALTH CARE MONITOR</title>
     <!-- Google Fonts & FontAwesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- 1. PATIENT REGISTRATION / ADMISSION MODAL -->
-    <div class="modal-overlay active" id="admissionModal">
-        <div class="modal-card glass-card">
-            <div class="modal-header">
-                <div class="hospital-brand">
-                    <i class="fa-solid fa-hospital-user pulse-icon"></i>
-                    <div>
-                        <h2>ST. JUDE AGENTIC MEDICAL CENTER</h2>
-                        <p>Patient Intake & Emergency Multi-Agent Triage System</p>
-                    </div>
-                </div>
-            </div>
-            <form id="admissionForm" class="modal-body">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="patientName"><i class="fa-solid fa-user"></i> Full Patient Name</label>
-                        <input type="text" id="patientName" placeholder="e.g. John Doe" value="Sarah Jenkins" required>
-                    </div>
-                    <div class="form-group short">
-                        <label for="patientAge"><i class="fa-solid fa-calendar-day"></i> Age</label>
-                        <input type="number" id="patientAge" placeholder="Age" min="1" max="110" value="58" required>
-                    </div>
-                    <div class="form-group short">
-                        <label for="patientGender"><i class="fa-solid fa-venus-mars"></i> Gender</label>
-                        <select id="patientGender">
-                            <option value="Female" selected>Female</option>
-                            <option value="Male">Male</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="patientSymptoms"><i class="fa-solid fa-notes-medical"></i> Primary Chief Symptoms / Complaints</label>
-                    <textarea id="patientSymptoms" rows="2" placeholder="Describe symptoms (e.g. Shortness of breath, chest pressure, fever, dizziness)" required>Sudden onset chest tightness, difficulty breathing, and cold sweats for 45 minutes.</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fa-solid fa-layer-group"></i> Select Initial Admission Scenario</label>
-                    <div class="modal-scenarios">
-                        <button type="button" class="scenario-pill active" data-scenario="cardiac">
-                            <i class="fa-solid fa-heart-pulse"></i> Acute Cardiac Distress
-                        </button>
-                        <button type="button" class="scenario-pill" data-scenario="sepsis">
-                            <i class="fa-solid fa-virus-covid"></i> Sepsis & High Fever
-                        </button>
-                        <button type="button" class="scenario-pill" data-scenario="hypoxia">
-                            <i class="fa-solid fa-lungs"></i> Severe Respiratory Crisis
-                        </button>
-                        <button type="button" class="scenario-pill" data-scenario="stable">
-                            <i class="fa-solid fa-circle-check"></i> Stable Baseline Monitor
-                        </button>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="submit" class="confirm-admission-btn">
-                        <i class="fa-solid fa-id-card"></i> Confirm Patient ID & Start Live Monitoring
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MAIN APP CONTAINER -->
-    <div class="app-container">
+    <!-- Main App Container -->
+    <div class="app-container" id="mainDashboard">
         <!-- Top Navigation Header -->
-        <header class="top-header">
+        <header class="top-header glass-card">
             <div class="brand">
                 <div class="logo-icon">
-                    <i class="fa-solid fa-hospital pulse-icon"></i>
+                    <i class="fa-solid fa-heart-pulse"></i>
                 </div>
                 <div class="brand-text">
-                    <h1>HEALTH-AGENTIX CENTER</h1>
-                    <span class="sub-badge">Real-Time Multi-Agent Hospital Telemetry</span>
-                </div>
-            </div>
-
-            <!-- Patient Profile Badge -->
-            <div class="patient-profile-card">
-                <div class="patient-avatar">
-                    <i class="fa-solid fa-user-doctor"></i>
-                </div>
-                <div class="patient-info">
-                    <div class="name-id-row">
-                        <span class="p-name" id="disp-patient-name">Sarah Jenkins</span>
-                        <span class="p-id-badge" id="disp-patient-id">PAT-2026-9042</span>
-                    </div>
-                    <div class="p-sub-details">
-                        <span id="disp-patient-age">Age 58 (Female)</span> • 
-                        <span class="symptom-tag" id="disp-patient-symptoms">Chest tightness, Dyspnea</span>
-                    </div>
-                </div>
-                <button class="re-register-btn" id="openAdmissionBtn" title="Register New Patient">
-                    <i class="fa-solid fa-user-plus"></i> New Patient
-                </button>
-            </div>
-
-            <!-- Header Telemetry Bar -->
-            <div class="header-telemetry">
-                <div class="telemetry-pill">
-                    <span class="pill-label">Bed Unit</span>
-                    <span class="pill-value highlight">ICU-Bed #04</span>
-                </div>
-                <div class="telemetry-pill">
-                    <span class="pill-label">Active Architecture</span>
-                    <span class="pill-value" id="active-arch-badge">Peer-to-Peer</span>
-                </div>
-                <div class="telemetry-pill alert-pill">
-                    <span class="pill-label">Clinical Status</span>
-                    <span class="pill-status status-critical" id="triage-status-badge">CRITICAL EMERGENCY</span>
+                    <h1>AGENTIC-AI MULTI AGENT HEALTH CARE MONITOR</h1>
+                    <span class="sub-badge">Symptom Checker, Home Remedies & Medicine Guide</span>
                 </div>
             </div>
         </header>
 
-        <!-- Main Layout Grid -->
-        <main class="dashboard-grid">
-            <!-- Left Sidebar: Patient Telemetry Sliders & Symptom Monitor -->
-            <aside class="sidebar-panel glass-card">
+        <!-- Main Workspace Grid -->
+        <main class="workspace-grid">
+            <!-- Left Panel: Expanded Symptom Checker -->
+            <aside class="panel glass-card left-panel">
                 <div class="panel-header">
-                    <h2><i class="fa-solid fa-sliders"></i> Live Telemetry Control</h2>
-                    <span class="live-pulse-badge"><span class="ping-dot"></span> LIVE TELEMETRY</span>
+                    <h2><i class="fa-solid fa-clipboard-user"></i> Patient & Symptom Input</h2>
                 </div>
 
-                <!-- Active Patient Symptoms Card -->
-                <div class="symptoms-summary-box">
-                    <div class="box-title"><i class="fa-solid fa-stethoscope"></i> Chief Complaints</div>
-                    <p id="sidebar-symptoms-text">Chest tightness, shortness of breath, cold sweats.</p>
-                </div>
-
-                <!-- Vital Sign Sliders -->
-                <div class="sliders-section">
-                    <label class="section-title">Adjust Live Telemetry Streams</label>
-
-                    <div class="slider-group">
-                        <div class="slider-info">
-                            <span>Heart Rate (HR)</span>
-                            <span class="slider-val" id="val-hr">148 bpm</span>
-                        </div>
-                        <input type="range" id="slider-hr" min="40" max="200" value="148">
+                <form id="symptomForm" class="symptom-form">
+                    <!-- Patient Basics (Auto-filled from user profile) -->
+                    <div class="form-group">
+                        <label for="patientName"><i class="fa-solid fa-user"></i> Full Name</label>
+                        <input type="text" id="patientName" placeholder="Enter your name" required>
                     </div>
 
-                    <div class="slider-group">
-                        <div class="slider-info">
-                            <span>Oxygen Saturation (SpO2)</span>
-                            <span class="slider-val" id="val-spo2">89 %</span>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patientAge"><i class="fa-solid fa-calendar"></i> Age</label>
+                            <input type="number" id="patientAge" min="1" max="110" required>
                         </div>
-                        <input type="range" id="slider-spo2" min="70" max="100" value="89">
+                        <div class="form-group">
+                            <label for="patientGender"><i class="fa-solid fa-venus-mars"></i> Gender</label>
+                            <select id="patientGender">
+                                <option value="Female">Female</option>
+                                <option value="Male">Male</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="slider-group">
-                        <div class="slider-info">
-                            <span>Systolic Blood Pressure</span>
-                            <span class="slider-val" id="val-sbp">82 mmHg</span>
+                    <!-- Expanded Symptom Selector -->
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-notes-medical"></i> Select Your Symptoms (Check All That Apply)</label>
+                        <p class="sub-label">Select symptoms you are experiencing today:</p>
+
+                        <div class="symptom-chips-grid">
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="fever" id="chk-fever">
+                                <span class="chip-content"><i class="fa-solid fa-temperature-high"></i> Fever / Chills</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="cough" id="chk-cough" checked>
+                                <span class="chip-content"><i class="fa-solid fa-head-side-cough"></i> Cough</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="sore_throat" id="chk-sore_throat" checked>
+                                <span class="chip-content"><i class="fa-solid fa-virus"></i> Sore Throat</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="cold_runny_nose" id="chk-cold_runny_nose" checked>
+                                <span class="chip-content"><i class="fa-solid fa-snowflake"></i> Cold / Runny Nose</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="headache" id="chk-headache">
+                                <span class="chip-content"><i class="fa-solid fa-brain"></i> Headache / Migraine</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="body_ache" id="chk-body_ache">
+                                <span class="chip-content"><i class="fa-solid fa-child"></i> Body / Joint Aches</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="fatigue" id="chk-fatigue" checked>
+                                <span class="chip-content"><i class="fa-solid fa-bed"></i> Fatigue / Weakness</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="stomach_pain" id="chk-stomach_pain">
+                                <span class="chip-content"><i class="fa-solid fa-utensils"></i> Stomach Cramps</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="acidity_heartburn" id="chk-acidity_heartburn">
+                                <span class="chip-content"><i class="fa-solid fa-fire"></i> Acidity / Heartburn</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="nausea" id="chk-nausea">
+                                <span class="chip-content"><i class="fa-solid fa-face-grimace"></i> Nausea / Vomiting</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="diarrhea" id="chk-diarrhea">
+                                <span class="chip-content"><i class="fa-solid fa-toilet"></i> Diarrhea / Loose Motion</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="dizziness" id="chk-dizziness">
+                                <span class="chip-content"><i class="fa-solid fa-spinner"></i> Dizziness</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="skin_rash" id="chk-skin_rash">
+                                <span class="chip-content"><i class="fa-solid fa-allergies"></i> Skin Rash / Itching</span>
+                            </label>
+
+                            <label class="symptom-checkbox-card">
+                                <input type="checkbox" value="chest_pain" id="chk-chest_pain">
+                                <span class="chip-content alert-chip"><i class="fa-solid fa-heart-crack"></i> Chest Pain</span>
+                            </label>
                         </div>
-                        <input type="range" id="slider-sbp" min="60" max="220" value="82">
                     </div>
 
-                    <div class="slider-group">
-                        <div class="slider-info">
-                            <span>Respiration Rate</span>
-                            <span class="slider-val" id="val-rr">28 /min</span>
-                        </div>
-                        <input type="range" id="slider-rr" min="8" max="45" value="28">
-                    </div>
-
-                    <div class="slider-group">
-                        <div class="slider-info">
-                            <span>Body Temperature</span>
-                            <span class="slider-val" id="val-temp">37.4 °C</span>
-                        </div>
-                        <input type="range" id="slider-temp" min="35.0" max="41.5" step="0.1" value="37.4">
-                    </div>
-
-                    <div class="slider-group">
-                        <div class="slider-info">
-                            <span>Blood Glucose</span>
-                            <span class="slider-val" id="val-glucose">185 mg/dL</span>
-                        </div>
-                        <input type="range" id="slider-glucose" min="50" max="400" value="185">
-                    </div>
-
-                    <div class="slider-group">
-                        <div class="slider-info">
-                            <span>Cardiac Troponin I</span>
-                            <span class="slider-val" id="val-troponin">2.15 ng/mL</span>
-                        </div>
-                        <input type="range" id="slider-troponin" min="0.00" max="5.00" step="0.05" value="2.15">
-                    </div>
-                </div>
-
-                <button class="trigger-agents-btn" id="run-agents-btn">
-                    <i class="fa-solid fa-brain"></i> Trigger Multi-Agent Evaluation
-                </button>
+                    <button type="submit" class="analyze-btn" id="analyzeBtn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze Symptoms & Compare Remedies
+                    </button>
+                </form>
             </aside>
 
-            <!-- Center Content: Vital Telemetry & Architecture Explorer -->
-            <section class="center-content">
-                <!-- Top Row: Animated Vital Telemetry Cards & Organ System Visualizer -->
-                <div class="vitals-header-container glass-card">
-                    <!-- Dynamic Anatomical Body Organ Scanner -->
-                    <div class="organ-scanner-box">
-                        <div class="scanner-title">
-                            <span><i class="fa-solid fa-child-reaching"></i> Real-Time Anatomical Organ Distress Scanner</span>
-                            <span class="scanner-status" id="organ-scanner-status">Targeted: Heart & Lungs</span>
-                        </div>
-                        <div class="organ-nodes-flex">
-                            <div class="organ-node organ-heart active-organ" id="organ-heart">
-                                <i class="fa-solid fa-heart-pulse organ-icon"></i>
-                                <span>Cardiovascular</span>
-                                <span class="organ-tag tag-critical" id="tag-heart">ISCHEMIA RISK</span>
-                            </div>
-
-                            <div class="organ-node organ-lungs active-organ" id="organ-lungs">
-                                <i class="fa-solid fa-lungs organ-icon"></i>
-                                <span>Respiratory</span>
-                                <span class="organ-tag tag-urgent" id="tag-lungs">HYPOXIA</span>
-                            </div>
-
-                            <div class="organ-node organ-pancreas" id="organ-pancreas">
-                                <i class="fa-solid fa-vial organ-icon"></i>
-                                <span>Metabolic</span>
-                                <span class="organ-tag tag-normal" id="tag-pancreas">NORMAL</span>
-                            </div>
-
-                            <div class="organ-node organ-brain" id="organ-brain">
-                                <i class="fa-solid fa-brain organ-icon"></i>
-                                <span>Neurological</span>
-                                <span class="organ-tag tag-normal" id="tag-brain">PERFUSED</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Animated Vital Cards Grid -->
-                    <div class="vital-cards-grid">
-                        <div class="vital-card card-pulse-danger" id="card-hr">
-                            <i class="fa-solid fa-heartbeat card-icon"></i>
-                            <div class="card-meta">
-                                <span class="card-title">Heart Rate</span>
-                                <span class="card-value" id="card-val-hr">148</span>
-                                <span class="card-unit">BPM</span>
-                            </div>
-                        </div>
-
-                        <div class="vital-card card-pulse-warning" id="card-spo2">
-                            <i class="fa-solid fa-lungs card-icon"></i>
-                            <div class="card-meta">
-                                <span class="card-title">SpO2 Oxygen</span>
-                                <span class="card-value" id="card-val-spo2">89</span>
-                                <span class="card-unit">%</span>
-                            </div>
-                        </div>
-
-                        <div class="vital-card card-pulse-danger" id="card-bp">
-                            <i class="fa-solid fa-gauge-high card-icon"></i>
-                            <div class="card-meta">
-                                <span class="card-title">Blood Pressure</span>
-                                <span class="card-value" id="card-val-bp">82/53</span>
-                                <span class="card-unit">mmHg</span>
-                            </div>
-                        </div>
-
-                        <div class="vital-card" id="card-temp">
-                            <i class="fa-solid fa-temperature-three-quarters card-icon"></i>
-                            <div class="card-meta">
-                                <span class="card-title">Body Temp</span>
-                                <span class="card-value" id="card-val-temp">37.4</span>
-                                <span class="card-unit">°C</span>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Center Panel: Assessment Result, Home Remedies & Medicine Comparison Table -->
+            <section class="panel glass-card center-panel">
+                <div class="panel-header">
+                    <h2><i class="fa-solid fa-house-medical-flag"></i> Health Assessment, Home Remedies & Medicine Guide</h2>
                 </div>
 
-                <!-- Multi-Agent Architecture Explorer & Patient Q&A Tabs -->
-                <div class="arch-explorer glass-card">
-                    <div class="arch-nav-tabs">
-                        <button class="tab-btn active" data-tab="p2p">
-                            <i class="fa-solid fa-diagram-project"></i> 1. Peer-to-Peer (P2P)
-                        </button>
-                        <button class="tab-btn" data-tab="blackboard">
-                            <i class="fa-solid fa-chalkboard"></i> 2. Blackboard Shared Memory
-                        </button>
-                        <button class="tab-btn" data-tab="parallel">
-                            <i class="fa-solid fa-network-wired"></i> 3. Parallel Execution
-                        </button>
-                        <button class="tab-btn" data-tab="sequential">
-                            <i class="fa-solid fa-timeline"></i> 4. Sequential Pipeline
-                        </button>
-                        <button class="tab-btn highlight-tab" data-tab="qa">
-                            <i class="fa-solid fa-comments"></i> 5. Patient Consultation Q&A
-                        </button>
+                <div class="result-content-wrapper">
+                    <!-- Assessment Header Box -->
+                    <div class="assessment-card" id="assessmentCard">
+                        <div class="assessment-top">
+                            <span class="patient-name-tag" id="res-patient-tag">Sarah Jenkins (Age 28)</span>
+                            <span class="conf-badge" id="res-confidence">98.98% Match</span>
+                        </div>
+                        <h3 id="res-condition-title">Common Cold & Upper Respiratory Infection</h3>
+                        <div class="severity-row">
+                            <span>Care Status:</span>
+                            <span class="severity-pill pill-mild" id="res-severity-pill">Mild (Home Care)</span>
+                        </div>
                     </div>
 
-                    <div class="tab-content-area">
-                        <!-- TAB 1: PEER TO PEER -->
-                        <div class="tab-pane active" id="pane-p2p">
-                            <div class="arch-intro">
-                                <h3>Peer-to-Peer (P2P) Specialist Agent Mesh</h3>
-                                <p>Specialist medical agents directly exchange P2P messages and cross-examine patient risks without central intervention.</p>
-                            </div>
-                            <div class="p2p-visualization">
-                                <div class="agent-nodes-container">
-                                    <div class="agent-node" id="node-pulmo">
-                                        <i class="fa-solid fa-lungs"></i>
-                                        <span>Pulmonologist Agent</span>
-                                    </div>
-                                    <div class="node-link link-pulmo-cardio"></div>
-                                    <div class="agent-node" id="node-cardio">
-                                        <i class="fa-solid fa-heart-pulse"></i>
-                                        <span>Cardiologist Agent</span>
-                                    </div>
-                                    <div class="node-link link-cardio-endo"></div>
-                                    <div class="agent-node" id="node-endo">
-                                        <i class="fa-solid fa-dna"></i>
-                                        <span>Endocrinologist Agent</span>
-                                    </div>
-                                </div>
-                                <div class="p2p-message-feed" id="p2p-msg-feed">
-                                    <div class="feed-placeholder">Trigger an agentic evaluation to view direct P2P specialist dialogue...</div>
-                                </div>
-                            </div>
+                    <!-- Recommended Home Remedies Section -->
+                    <div class="remedies-section">
+                        <h3><i class="fa-solid fa-mug-hot"></i> Recommended Everyday Home Remedies</h3>
+                        <div class="remedies-list" id="remediesList">
+                            <!-- Dynamic Remedy Cards -->
+                        </div>
+                    </div>
+
+                    <!-- English Medicine vs Natural Medicine Comparison Table -->
+                    <div class="medicine-comparison-section" id="medicineComparisonSection">
+                        <div class="section-title-bar">
+                            <h3><i class="fa-solid fa-scale-balanced"></i> English Medicine vs. Natural Medicine Comparison</h3>
+                            <span class="section-subtitle">Side-by-Side Efficacy & Most Effective Treatment Guide</span>
                         </div>
 
-                        <!-- TAB 2: BLACKBOARD ARCHITECTURE -->
-                        <div class="tab-pane" id="pane-blackboard">
-                            <div class="arch-intro">
-                                <h3>Blackboard Shared Memory Architecture</h3>
-                                <p>Central state repository updated asynchronously by telemetry, lab analysis, and hypothesis knowledge sources.</p>
-                            </div>
-                            <div class="blackboard-container">
-                                <div class="blackboard-status-banner">
-                                    <span>Global Blackboard Alert Status:</span>
-                                    <span class="bb-status-flag red" id="bb-alert-flag">RED - CRITICAL CARDIAC EMERGENCY</span>
-                                </div>
-                                <table class="blackboard-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Timestamp</th>
-                                            <th>Knowledge Source (KS)</th>
-                                            <th>Category</th>
-                                            <th>Shared Memory Payload</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="blackboard-entries-body">
-                                        <tr><td colspan="4" class="text-center">Click 'Trigger Multi-Agent Evaluation' to update Blackboard.</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div class="table-responsive-box">
+                            <table class="medicine-comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>Target Symptom / Purpose</th>
+                                        <th>English Medicine (Allopathic OTC)</th>
+                                        <th>Natural / Home Remedy</th>
+                                        <th>Most Effective Choice & Rationale</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="medicineTableBody">
+                                    <!-- Dynamic Table Rows -->
+                                </tbody>
+                            </table>
                         </div>
+                    </div>
 
-                        <!-- TAB 3: PARALLEL EXECUTION -->
-                        <div class="tab-pane" id="pane-parallel">
-                            <div class="arch-intro">
-                                <h3>Parallel Async Sensor Processing Architecture</h3>
-                                <p>Multi-channel sensor feeds are processed concurrently in parallel to minimize anomaly detection latency.</p>
-                            </div>
-                            <div class="parallel-metrics-grid">
-                                <div class="worker-card" id="worker-cardio">
-                                    <div class="worker-header">
-                                        <i class="fa-solid fa-heart-pulse"></i>
-                                        <span>Cardiovascular Worker</span>
-                                    </div>
-                                    <div class="worker-body">
-                                        <span class="worker-latency" id="lat-cardio">2.41 ms</span>
-                                        <span class="worker-status status-critical" id="stat-cardio">CRITICAL</span>
-                                    </div>
-                                </div>
-
-                                <div class="worker-card" id="worker-respiratory">
-                                    <div class="worker-header">
-                                        <i class="fa-solid fa-lungs"></i>
-                                        <span>Respiratory Worker</span>
-                                    </div>
-                                    <div class="worker-body">
-                                        <span class="worker-latency" id="lat-resp">2.15 ms</span>
-                                        <span class="worker-status status-critical" id="stat-resp">CRITICAL</span>
-                                    </div>
-                                </div>
-
-                                <div class="worker-card" id="worker-metabolic">
-                                    <div class="worker-header">
-                                        <i class="fa-solid fa-vial"></i>
-                                        <span>Metabolic & Lab Worker</span>
-                                    </div>
-                                    <div class="worker-body">
-                                        <span class="worker-latency" id="lat-metabolic">2.98 ms</span>
-                                        <span class="worker-status status-mild" id="stat-metabolic">ABNORMAL</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="total-parallel-bar">
-                                <span>Total Parallel Execution Time:</span>
-                                <strong id="total-parallel-time">2.98 ms (Sub-millisecond Concurrent Threads)</strong>
-                            </div>
-                        </div>
-
-                        <!-- TAB 4: SEQUENTIAL PIPELINE -->
-                        <div class="tab-pane" id="pane-sequential">
-                            <div class="arch-intro">
-                                <h3>Sequential / Pipeline Architecture</h3>
-                                <p>Structured 5-stage processing pipeline for deterministic data transformations and risk triage.</p>
-                            </div>
-                            <div class="pipeline-flow-container">
-                                <div class="pipeline-step" id="step-1">
-                                    <div class="step-num">1</div>
-                                    <div class="step-content">
-                                        <h4>Telemetry Ingestion</h4>
-                                        <p id="p-step-1">Validating sensor stream...</p>
-                                    </div>
-                                </div>
-                                <div class="pipeline-arrow"><i class="fa-solid fa-angle-right"></i></div>
-
-                                <div class="pipeline-step" id="step-2">
-                                    <div class="step-num">2</div>
-                                    <div class="step-content">
-                                        <h4>Feature Engineering</h4>
-                                        <p id="p-step-2">Computing Shock Index...</p>
-                                    </div>
-                                </div>
-                                <div class="pipeline-arrow"><i class="fa-solid fa-angle-right"></i></div>
-
-                                <div class="pipeline-step" id="step-3">
-                                    <div class="step-num">3</div>
-                                    <div class="step-content">
-                                        <h4>ML Risk Scoring</h4>
-                                        <p id="p-step-3">Evaluating Random Forest...</p>
-                                    </div>
-                                </div>
-                                <div class="pipeline-arrow"><i class="fa-solid fa-angle-right"></i></div>
-
-                                <div class="pipeline-step" id="step-4">
-                                    <div class="step-num">4</div>
-                                    <div class="step-content">
-                                        <h4>Clinical Triage</h4>
-                                        <p id="p-step-4">Categorizing priority...</p>
-                                    </div>
-                                </div>
-                                <div class="pipeline-arrow"><i class="fa-solid fa-angle-right"></i></div>
-
-                                <div class="pipeline-step" id="step-5">
-                                    <div class="step-num">5</div>
-                                    <div class="step-content">
-                                        <h4>Action Dispatch</h4>
-                                        <p id="p-step-5">Issuing hospital alert...</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB 5: PATIENT MEDICAL CONSULTATION & Q&A -->
-                        <div class="tab-pane" id="pane-qa">
-                            <div class="arch-intro">
-                                <h3><i class="fa-solid fa-user-doctor"></i> Patient AI Consultation Portal</h3>
-                                <p>Ask your medical questions, symptoms, or disease doubts. Our Multi-Agent Specialist Panel (Cardiologist, Pulmonologist, Endocrinologist) provides immediate agentic guidance.</p>
-                            </div>
-
-                            <!-- Quick Question Suggestion Chips -->
-                            <div class="qa-quick-chips">
-                                <span>Suggested Doubts:</span>
-                                <button class="chip-btn" data-question="What does elevated Troponin (2.15 ng/mL) mean for my heart?">
-                                    ❤️ Troponin & Chest Pain
-                                </button>
-                                <button class="chip-btn" data-question="Why is my SpO2 89% and what should I do for shortness of breath?">
-                                    🫁 Low SpO2 & Breathing
-                                </button>
-                                <button class="chip-btn" data-question="Is blood glucose 185 mg/dL dangerous during acute stress?">
-                                    🩸 Glucose & Stress
-                                </button>
-                            </div>
-
-                            <!-- Chat Messages Window -->
-                            <div class="qa-chat-window" id="qaChatWindow">
-                                <div class="chat-bubble bot-bubble">
-                                    <div class="bubble-header">
-                                        <i class="fa-solid fa-user-doctor"></i>
-                                        <span>Multi-Agent Specialist Panel</span>
-                                    </div>
-                                    <p>Hello <strong id="chat-patient-name">Sarah Jenkins</strong>. We are monitoring your real-time vital telemetry. What questions or symptoms would you like to ask our specialist agents today?</p>
-                                </div>
-                            </div>
-
-                            <!-- Chat Input Form -->
-                            <form class="qa-input-form" id="qaForm">
-                                <input type="text" id="qaInput" placeholder="Type your disease or health doubt here... (e.g. Why is my heart rate fast?)" required>
-                                <button type="submit" class="qa-send-btn">
-                                    <i class="fa-solid fa-paper-plane"></i> Ask Agents
-                                </button>
-                            </form>
+                    <!-- Doctor Advice Box -->
+                    <div class="doctor-advice-box">
+                        <i class="fa-solid fa-user-doctor advice-icon"></i>
+                        <div>
+                            <strong>Physician Advice:</strong>
+                            <p id="res-doctor-advice">Seek a doctor if fever exceeds 102°F or symptoms persist longer than 7 days.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Right Sidebar: Live Agent Console & ML Prediction Panel -->
-            <aside class="right-panel glass-card">
+            <!-- Right Panel: AI Health Assistant Chat -->
+            <aside class="panel glass-card right-panel">
                 <div class="panel-header">
-                    <h2><i class="fa-solid fa-microchip"></i> ML Model Prediction</h2>
-                    <span class="badge-tag">RandomForest v1.0</span>
+                    <h2><i class="fa-solid fa-comments"></i> AI Health Assistant</h2>
+                    <span class="online-tag"><span class="dot"></span> Answers Anything</span>
                 </div>
 
-                <!-- ML Model Prediction Card -->
-                <div class="ml-pred-box">
-                    <div class="pred-header">
-                        <span>Predicted Risk State</span>
-                        <span class="conf-badge" id="ml-confidence">99.8% Conf</span>
+                <div class="chat-wrapper">
+                    <!-- Quick Doubts Suggestion Chips -->
+                    <div class="quick-doubts-bar">
+                        <span>Ask Me Anything:</span>
+                        <button class="chip-btn" data-query="Which medicine is most effective for my condition?">
+                            ⚖️ Which medicine is most effective?
+                        </button>
+                        <button class="chip-btn" data-query="Can I take Paracetamol together with natural ginger tea?">
+                            💊 Paracetamol + Ginger Tea?
+                        </button>
+                        <button class="chip-btn" data-query="Can I take ginger tea if I have acidity?">
+                            🍵 Ginger tea & acidity?
+                        </button>
+                        <button class="chip-btn" data-query="What foods should I eat or avoid right now?">
+                            🍌 What foods to eat?
+                        </button>
+                        <button class="chip-btn" data-query="When should I visit a medical doctor?">
+                            👨‍⚕️ When to visit doctor?
+                        </button>
                     </div>
-                    <div class="pred-result status-critical-text" id="ml-risk-result">
-                        CRITICAL EMERGENCY
-                    </div>
-                    <div class="prob-bars">
-                        <div class="prob-row">
-                            <span>Normal</span>
-                            <div class="prob-bar-track"><div class="prob-bar-fill fill-normal" id="pbar-0" style="width: 1%;"></div></div>
-                        </div>
-                        <div class="prob-row">
-                            <span>Mild Distress</span>
-                            <div class="prob-bar-track"><div class="prob-bar-fill fill-mild" id="pbar-1" style="width: 4%;"></div></div>
-                        </div>
-                        <div class="prob-row">
-                            <span>Urgent Care</span>
-                            <div class="prob-bar-track"><div class="prob-bar-fill fill-urgent" id="pbar-2" style="width: 10%;"></div></div>
-                        </div>
-                        <div class="prob-row">
-                            <span>Critical Emergency</span>
-                            <div class="prob-bar-track"><div class="prob-bar-fill fill-critical" id="pbar-3" style="width: 85%;"></div></div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Live Agent Reasoning & Log Stream -->
-                <div class="agent-console">
-                    <div class="console-header">
-                        <span><i class="fa-solid fa-terminal"></i> Multi-Agent Real-Time Log</span>
-                        <button class="clear-btn" id="clear-console-btn"><i class="fa-solid fa-trash"></i></button>
+                    <!-- Chat Messages Window -->
+                    <div class="chat-messages-window" id="chatWindow">
+                        <div class="chat-bubble bot-bubble">
+                            <div class="bubble-header">
+                                <i class="fa-solid fa-robot"></i>
+                                <span>AI Health Assistant</span>
+                            </div>
+                            <p>Hello <strong id="chat-patient-name">Sarah Jenkins</strong>! I can answer **ANY question** you have—about your remedies, English vs. Natural medicines, side effects, food diet, or symptom doubts. What would you like to ask?</p>
+                        </div>
                     </div>
-                    <div class="console-body" id="console-logs">
-                        <div class="log-entry log-sys">[SYS] Patient Sarah Jenkins (Age 58) admitted. Multi-Agent telemetry active.</div>
-                    </div>
+
+                    <!-- Chat Form Input -->
+                    <form id="chatForm" class="chat-input-form">
+                        <input type="text" id="chatInput" placeholder="Ask me anything (e.g. Which is better: Paracetamol or Steam?)..." required>
+                        <button type="submit" class="send-btn">
+                            <i class="fa-solid fa-paper-plane"></i> Ask
+                        </button>
+                    </form>
                 </div>
             </aside>
         </main>

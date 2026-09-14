@@ -1,0 +1,10 @@
+{
+  "sarah@example.com": {
+    "name": "Sarah Jenkins",
+    "email": "sarah@example.com",
+    "dob": "1998-05-14",
+    "age": 28,
+    "gender": "Female",
+    "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c"
+  }
+}
