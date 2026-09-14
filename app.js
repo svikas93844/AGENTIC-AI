@@ -406,16 +406,16 @@ document.addEventListener('DOMContentLoaded', () => {
         sunMesh.add(coronaMesh);
         solarSystemGroup.add(sunMesh);
 
-        // 2. PLANETARY DATA WITH ORIGINAL REAL COLORS
+        // 2. PLANETARY DATA WITH ORIGINAL REAL COLORS (Slower, Majestic Speeds)
         const planetsData = [
-            { name: 'Mercury', color: 0xa8a8a8, radius: 0.35, dist: 5.2, speed: 0.035 },
-            { name: 'Venus',   color: 0xe3bb76, radius: 0.55, dist: 7.8, speed: 0.025 },
-            { name: 'Earth',   color: 0x2b82c5, radius: 0.65, dist: 10.8, speed: 0.018, hasMoon: true },
-            { name: 'Mars',    color: 0xc1440e, radius: 0.45, dist: 14.0, speed: 0.014 },
-            { name: 'Jupiter', color: 0xb07f35, radius: 1.35, dist: 18.2, speed: 0.009 },
-            { name: 'Saturn',  color: 0xe2bf7d, radius: 1.10, dist: 23.0, speed: 0.007, hasRings: true },
-            { name: 'Uranus',  color: 0x4b70dd, radius: 0.85, dist: 27.5, speed: 0.005, hasRings: true },
-            { name: 'Neptune', color: 0x274687, radius: 0.80, dist: 31.8, speed: 0.003 }
+            { name: 'Mercury', color: 0xa8a8a8, radius: 0.35, dist: 5.2, speed: 0.006 },
+            { name: 'Venus',   color: 0xe3bb76, radius: 0.55, dist: 7.8, speed: 0.004 },
+            { name: 'Earth',   color: 0x2b82c5, radius: 0.65, dist: 10.8, speed: 0.003, hasMoon: true },
+            { name: 'Mars',    color: 0xc1440e, radius: 0.45, dist: 14.0, speed: 0.002 },
+            { name: 'Jupiter', color: 0xb07f35, radius: 1.35, dist: 18.2, speed: 0.0012 },
+            { name: 'Saturn',  color: 0xe2bf7d, radius: 1.10, dist: 23.0, speed: 0.0009, hasRings: true },
+            { name: 'Uranus',  color: 0x4b70dd, radius: 0.85, dist: 27.5, speed: 0.0006, hasRings: true },
+            { name: 'Neptune', color: 0x274687, radius: 0.80, dist: 31.8, speed: 0.0004 }
         ];
 
         const planetMeshes = [];
@@ -547,24 +547,24 @@ document.addEventListener('DOMContentLoaded', () => {
             requestAnimationFrame(animate);
             const delta = clock.getDelta();
 
-            // Sun Self-Rotation & Pulsing Corona
-            sunMesh.rotation.y += 0.004;
-            coronaMesh.rotation.y -= 0.006;
-            coronaMesh.rotation.z += 0.003;
+            // Sun Self-Rotation & Pulsing Corona (Slower, Majestic)
+            sunMesh.rotation.y += 0.001;
+            coronaMesh.rotation.y -= 0.0015;
+            coronaMesh.rotation.z += 0.0008;
 
             // Rotate Planets in Orbit around Sun
             planetMeshes.forEach(item => {
                 item.pivot.rotation.y += item.speed;
-                item.pMesh.rotation.y += 0.02; // Self axial rotation
+                item.pMesh.rotation.y += 0.005; // Self axial rotation
                 if (item.pMesh.userData.moonPivot) {
-                    item.pMesh.userData.moonPivot.rotation.y += 0.04;
+                    item.pMesh.userData.moonPivot.rotation.y += 0.01;
                 }
             });
 
             // Smooth Solar System Motion reacting to Mouse Cursor
-            solarSystemGroup.rotation.y += 0.001 + mouseX;
+            solarSystemGroup.rotation.y += 0.0002 + mouseX;
             solarSystemGroup.rotation.x = 0.35 + mouseY;
-            starField.rotation.y -= 0.0003;
+            starField.rotation.y -= 0.0001;
 
             renderer.render(scene, camera);
         }
