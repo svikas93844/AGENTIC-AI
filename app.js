@@ -363,94 +363,209 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ------------------------------------------
-    // 7. THREE.JS 3D SCENE 1: ADMISSION DNA HELIX & MOLECULAR ORB
+    // 7. THREE.JS 3D SCENE 1: SOLAR SYSTEM WITH ORIGINAL PLANETARY COLORS
     // ------------------------------------------
     function initAdmission3DScene() {
         const canvas = document.getElementById('admission3DCanvas');
         if (!canvas || !window.THREE) return;
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 25;
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 18, 35);
+        camera.lookAt(0, 0, 0);
 
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // Create DNA Double Helix Group
-        const dnaGroup = new THREE.Group();
-        const numPairs = 30;
-        const radius = 4;
-        const heightStep = 0.5;
+        // Ambient & Point Lighting for Real Shading
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
 
-        const sphereGeo = new THREE.SphereGeometry(0.3, 16, 16);
-        const tealMat = new THREE.MeshBasicMaterial({ color: 0x14b8a6, wireframe: true });
-        const cyanMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, wireframe: true });
-        const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6 });
+        const sunLight = new THREE.PointLight(0xffddaa, 2.5, 300);
+        sunLight.position.set(0, 0, 0);
+        scene.add(sunLight);
 
-        for (let i = 0; i < numPairs; i++) {
-            const angle = i * 0.3;
-            const y = (i - numPairs / 2) * heightStep;
+        const solarSystemGroup = new THREE.Group();
+        solarSystemGroup.rotation.x = 0.35; // Tilt solar system plane slightly for 3D perspective
 
-            const x1 = Math.cos(angle) * radius;
-            const z1 = Math.sin(angle) * radius;
-            const s1 = new THREE.Mesh(sphereGeo, tealMat);
-            s1.position.set(x1, y, z1);
-            dnaGroup.add(s1);
+        // 1. THE SUN (Glowing Bright Golden Orange)
+        const sunGeo = new THREE.SphereGeometry(2.4, 32, 32);
+        const sunMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+        const sunMesh = new THREE.Mesh(sunGeo, sunMat);
 
-            const x2 = Math.cos(angle + Math.PI) * radius;
-            const z2 = Math.sin(angle + Math.PI) * radius;
-            const s2 = new THREE.Mesh(sphereGeo, cyanMat);
-            s2.position.set(x2, y, z2);
-            dnaGroup.add(s2);
-
-            const lineGeo = new THREE.BufferGeometry().setFromPoints([
-                new THREE.Vector3(x1, y, z1),
-                new THREE.Vector3(x2, y, z2)
-            ]);
-            const rung = new THREE.Line(lineGeo, lineMat);
-            dnaGroup.add(rung);
-        }
-
-        scene.add(dnaGroup);
-
-        // Particle Stars Background
-        const particlesGeo = new THREE.BufferGeometry();
-        const pCount = 1200;
-        const posArray = new Float32Array(pCount * 3);
-        for (let i = 0; i < pCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 80;
-        }
-        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMat = new THREE.PointsMaterial({
-            size: 0.15,
-            color: 0x2dd4bf,
+        // Sun Glow Corona Outer Mesh
+        const coronaGeo = new THREE.SphereGeometry(2.8, 32, 32);
+        const coronaMat = new THREE.MeshBasicMaterial({
+            color: 0xff6600,
             transparent: true,
-            opacity: 0.7
+            opacity: 0.35,
+            wireframe: true
         });
-        const particleMesh = new THREE.Points(particlesGeo, particlesMat);
-        scene.add(particleMesh);
+        const coronaMesh = new THREE.Mesh(coronaGeo, coronaMat);
+        sunMesh.add(coronaMesh);
+        solarSystemGroup.add(sunMesh);
 
-        // Animation Loop & Interactive Mouse Tilt
+        // 2. PLANETARY DATA WITH ORIGINAL REAL COLORS
+        const planetsData = [
+            { name: 'Mercury', color: 0xa8a8a8, radius: 0.35, dist: 5.2, speed: 0.035 },
+            { name: 'Venus',   color: 0xe3bb76, radius: 0.55, dist: 7.8, speed: 0.025 },
+            { name: 'Earth',   color: 0x2b82c5, radius: 0.65, dist: 10.8, speed: 0.018, hasMoon: true },
+            { name: 'Mars',    color: 0xc1440e, radius: 0.45, dist: 14.0, speed: 0.014 },
+            { name: 'Jupiter', color: 0xb07f35, radius: 1.35, dist: 18.2, speed: 0.009 },
+            { name: 'Saturn',  color: 0xe2bf7d, radius: 1.10, dist: 23.0, speed: 0.007, hasRings: true },
+            { name: 'Uranus',  color: 0x4b70dd, radius: 0.85, dist: 27.5, speed: 0.005, hasRings: true },
+            { name: 'Neptune', color: 0x274687, radius: 0.80, dist: 31.8, speed: 0.003 }
+        ];
+
+        const planetMeshes = [];
+
+        planetsData.forEach(p => {
+            // Draw Translucent Orbital Track Line
+            const orbitPoints = [];
+            const segments = 90;
+            for (let i = 0; i <= segments; i++) {
+                const theta = (i / segments) * Math.PI * 2;
+                orbitPoints.push(new THREE.Vector3(Math.cos(theta) * p.dist, 0, Math.sin(theta) * p.dist));
+            }
+            const orbitGeo = new THREE.BufferGeometry().setFromPoints(orbitPoints);
+            const orbitMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.25 });
+            const orbitLine = new THREE.Line(orbitGeo, orbitMat);
+            solarSystemGroup.add(orbitLine);
+
+            // Pivot Container for Smooth Orbital Rotation
+            const pivot = new THREE.Group();
+            solarSystemGroup.add(pivot);
+
+            // Create Planet Sphere
+            const pGeo = new THREE.SphereGeometry(p.radius, 32, 32);
+            const pMat = new THREE.MeshPhongMaterial({
+                color: p.color,
+                shininess: 25,
+                emissive: p.color,
+                emissiveIntensity: 0.15
+            });
+            const pMesh = new THREE.Mesh(pGeo, pMat);
+            pMesh.position.x = p.dist;
+            pivot.add(pMesh);
+
+            // Saturn 3D Ring System
+            if (p.hasRings && p.name === 'Saturn') {
+                const ringGeo = new THREE.RingGeometry(p.radius * 1.4, p.radius * 2.4, 32);
+                const ringMat = new THREE.MeshBasicMaterial({
+                    color: 0xd4b068,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const saturnRing = new THREE.Mesh(ringGeo, ringMat);
+                saturnRing.rotation.x = Math.PI / 2.3;
+                pMesh.add(saturnRing);
+            }
+
+            // Uranus Thin Ring
+            if (p.hasRings && p.name === 'Uranus') {
+                const ringGeo = new THREE.RingGeometry(p.radius * 1.3, p.radius * 1.8, 32);
+                const ringMat = new THREE.MeshBasicMaterial({
+                    color: 0x7dd3fc,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                const uranusRing = new THREE.Mesh(ringGeo, ringMat);
+                uranusRing.rotation.x = Math.PI / 1.8;
+                pMesh.add(uranusRing);
+            }
+
+            // Earth's Orbiting Moon
+            if (p.hasMoon) {
+                const moonPivot = new THREE.Group();
+                pMesh.add(moonPivot);
+
+                const moonGeo = new THREE.SphereGeometry(0.18, 16, 16);
+                const moonMat = new THREE.MeshPhongMaterial({ color: 0xdddddd });
+                const moonMesh = new THREE.Mesh(moonGeo, moonMat);
+                moonMesh.position.x = 1.3;
+                moonPivot.add(moonMesh);
+                pMesh.userData.moonPivot = moonPivot;
+            }
+
+            planetMeshes.push({ pivot, pMesh, speed: p.speed });
+        });
+
+        scene.add(solarSystemGroup);
+
+        // 3. DEEP SPACE TWINKLING STARFIELD (2,000 Stars)
+        const starsGeo = new THREE.BufferGeometry();
+        const starCount = 2000;
+        const starPositions = new Float32Array(starCount * 3);
+        const starColors = new Float32Array(starCount * 3);
+
+        for (let i = 0; i < starCount; i++) {
+            starPositions[i * 3]     = (Math.random() - 0.5) * 160;
+            starPositions[i * 3 + 1] = (Math.random() - 0.5) * 160;
+            starPositions[i * 3 + 2] = (Math.random() - 0.5) * 160;
+
+            const r = 0.8 + Math.random() * 0.2;
+            const g = 0.8 + Math.random() * 0.2;
+            const b = 0.9 + Math.random() * 0.1;
+            starColors[i * 3]     = r;
+            starColors[i * 3 + 1] = g;
+            starColors[i * 3 + 2] = b;
+        }
+
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        starsGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+
+        const starsMat = new THREE.PointsMaterial({
+            size: 0.22,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.85
+        });
+        const starField = new THREE.Points(starsGeo, starsMat);
+        scene.add(starField);
+
+        // 4. ANIMATION & INTERACTIVE MOUSE ROTATION
         let mouseX = 0, mouseY = 0;
         document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - window.innerWidth / 2) * 0.0005;
-            mouseY = (e.clientY - window.innerHeight / 2) * 0.0005;
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.0003;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.0003;
 
             // 3D Card Tilt Effect
             const card = document.getElementById('intakeCard');
             if (card && elements.intakeOverlay.classList.contains('active')) {
-                const tiltX = (e.clientY / window.innerHeight - 0.5) * -15;
-                const tiltY = (e.clientX / window.innerWidth - 0.5) * 15;
+                const tiltX = (e.clientY / window.innerHeight - 0.5) * -12;
+                const tiltY = (e.clientX / window.innerWidth - 0.5) * 12;
                 card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
             }
         });
 
+        let clock = new THREE.Clock();
+
         function animate() {
             requestAnimationFrame(animate);
-            dnaGroup.rotation.y += 0.01 + mouseX;
-            dnaGroup.rotation.x += 0.005 + mouseY;
-            particleMesh.rotation.y -= 0.002;
+            const delta = clock.getDelta();
+
+            // Sun Self-Rotation & Pulsing Corona
+            sunMesh.rotation.y += 0.004;
+            coronaMesh.rotation.y -= 0.006;
+            coronaMesh.rotation.z += 0.003;
+
+            // Rotate Planets in Orbit around Sun
+            planetMeshes.forEach(item => {
+                item.pivot.rotation.y += item.speed;
+                item.pMesh.rotation.y += 0.02; // Self axial rotation
+                if (item.pMesh.userData.moonPivot) {
+                    item.pMesh.userData.moonPivot.rotation.y += 0.04;
+                }
+            });
+
+            // Smooth Solar System Motion reacting to Mouse Cursor
+            solarSystemGroup.rotation.y += 0.001 + mouseX;
+            solarSystemGroup.rotation.x = 0.35 + mouseY;
+            starField.rotation.y -= 0.0003;
+
             renderer.render(scene, camera);
         }
         animate();
