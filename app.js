@@ -363,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ------------------------------------------
-    // 7. THREE.JS 3D SCENE 1: SOLAR SYSTEM WITH ORIGINAL PLANETARY COLORS
+    // 7. THREE.JS 3D SCENE 1: HOLOGRAPHIC CYBER-MEDICAL BIO-SCANNER & DNA CORE
     // ------------------------------------------
     function initAdmission3DScene() {
         const canvas = document.getElementById('admission3DCanvas');
@@ -371,166 +371,147 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 18, 35);
+        camera.position.set(0, 5, 28);
         camera.lookAt(0, 0, 0);
 
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // Ambient & Point Lighting for Real Shading
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
         scene.add(ambientLight);
 
-        const sunLight = new THREE.PointLight(0xffddaa, 2.5, 300);
-        sunLight.position.set(0, 0, 0);
-        scene.add(sunLight);
+        const tealLight = new THREE.PointLight(0x14b8a6, 2, 100);
+        tealLight.position.set(10, 10, 10);
+        scene.add(tealLight);
 
-        const solarSystemGroup = new THREE.Group();
-        solarSystemGroup.rotation.x = 0.35; // Tilt solar system plane slightly for 3D perspective
+        const cyanLight = new THREE.PointLight(0x0284c7, 2, 100);
+        cyanLight.position.set(-10, -10, 10);
+        scene.add(cyanLight);
 
-        // 1. THE SUN (Glowing Bright Golden Orange)
-        const sunGeo = new THREE.SphereGeometry(2.4, 32, 32);
-        const sunMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
-        const sunMesh = new THREE.Mesh(sunGeo, sunMat);
+        const medicalGroup = new THREE.Group();
 
-        // Sun Glow Corona Outer Mesh
-        const coronaGeo = new THREE.SphereGeometry(2.8, 32, 32);
-        const coronaMat = new THREE.MeshBasicMaterial({
-            color: 0xff6600,
+        // 1. CENTRAL HOLOGRAPHIC BIO-CORE SPHERE
+        const coreGeo = new THREE.IcosahedronGeometry(3.2, 2);
+        const coreMat = new THREE.MeshBasicMaterial({
+            color: 0x14b8a6,
+            wireframe: true,
             transparent: true,
-            opacity: 0.35,
+            opacity: 0.5
+        });
+        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+
+        const innerGeo = new THREE.SphereGeometry(2.0, 32, 32);
+        const innerMat = new THREE.MeshBasicMaterial({
+            color: 0x0ea5e9,
+            transparent: true,
+            opacity: 0.65,
             wireframe: true
         });
-        const coronaMesh = new THREE.Mesh(coronaGeo, coronaMat);
-        sunMesh.add(coronaMesh);
-        solarSystemGroup.add(sunMesh);
+        const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+        coreMesh.add(innerMesh);
+        medicalGroup.add(coreMesh);
 
-        // 2. PLANETARY DATA WITH ORIGINAL REAL COLORS (Slower, Majestic Speeds)
-        const planetsData = [
-            { name: 'Mercury', color: 0xa8a8a8, radius: 0.35, dist: 5.2, speed: 0.006 },
-            { name: 'Venus',   color: 0xe3bb76, radius: 0.55, dist: 7.8, speed: 0.004 },
-            { name: 'Earth',   color: 0x2b82c5, radius: 0.65, dist: 10.8, speed: 0.003, hasMoon: true },
-            { name: 'Mars',    color: 0xc1440e, radius: 0.45, dist: 14.0, speed: 0.002 },
-            { name: 'Jupiter', color: 0xb07f35, radius: 1.35, dist: 18.2, speed: 0.0012 },
-            { name: 'Saturn',  color: 0xe2bf7d, radius: 1.10, dist: 23.0, speed: 0.0009, hasRings: true },
-            { name: 'Uranus',  color: 0x4b70dd, radius: 0.85, dist: 27.5, speed: 0.0006, hasRings: true },
-            { name: 'Neptune', color: 0x274687, radius: 0.80, dist: 31.8, speed: 0.0004 }
-        ];
+        // 2. ROTATING MEDICAL DNA DOUBLE HELIX STRAND
+        const dnaGroup = new THREE.Group();
+        const numPairs = 36;
+        const radius = 5.5;
+        const heightStep = 0.45;
 
-        const planetMeshes = [];
+        const sphereGeo = new THREE.SphereGeometry(0.28, 16, 16);
+        const tealMat = new THREE.MeshBasicMaterial({ color: 0x2dd4bf });
+        const cyanMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x14b8a6, transparent: true, opacity: 0.5 });
 
-        planetsData.forEach(p => {
-            // Draw Translucent Orbital Track Line
-            const orbitPoints = [];
-            const segments = 90;
-            for (let i = 0; i <= segments; i++) {
-                const theta = (i / segments) * Math.PI * 2;
-                orbitPoints.push(new THREE.Vector3(Math.cos(theta) * p.dist, 0, Math.sin(theta) * p.dist));
-            }
-            const orbitGeo = new THREE.BufferGeometry().setFromPoints(orbitPoints);
-            const orbitMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.25 });
-            const orbitLine = new THREE.Line(orbitGeo, orbitMat);
-            solarSystemGroup.add(orbitLine);
+        for (let i = 0; i < numPairs; i++) {
+            const angle = i * 0.28;
+            const y = (i - numPairs / 2) * heightStep;
 
-            // Pivot Container for Smooth Orbital Rotation
+            const x1 = Math.cos(angle) * radius;
+            const z1 = Math.sin(angle) * radius;
+            const s1 = new THREE.Mesh(sphereGeo, tealMat);
+            s1.position.set(x1, y, z1);
+            dnaGroup.add(s1);
+
+            const x2 = Math.cos(angle + Math.PI) * radius;
+            const z2 = Math.sin(angle + Math.PI) * radius;
+            const s2 = new THREE.Mesh(sphereGeo, cyanMat);
+            s2.position.set(x2, y, z2);
+            dnaGroup.add(s2);
+
+            const lineGeo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(x1, y, z1),
+                new THREE.Vector3(x2, y, z2)
+            ]);
+            const rung = new THREE.Line(lineGeo, lineMat);
+            dnaGroup.add(rung);
+        }
+        dnaGroup.rotation.z = Math.PI / 6;
+        medicalGroup.add(dnaGroup);
+
+        // 3. ORBITING MEDICAL ORGAN SCANNER NODES & VITAL RINGS
+        const nodeColors = [0x10b981, 0xf59e0b, 0x06b6d4, 0xec4899];
+        const scannerNodes = [];
+
+        nodeColors.forEach((col, idx) => {
             const pivot = new THREE.Group();
-            solarSystemGroup.add(pivot);
+            pivot.rotation.y = (idx * Math.PI) / 2;
+            pivot.rotation.x = idx * 0.2;
 
-            // Create Planet Sphere
-            const pGeo = new THREE.SphereGeometry(p.radius, 32, 32);
-            const pMat = new THREE.MeshPhongMaterial({
-                color: p.color,
-                shininess: 25,
-                emissive: p.color,
-                emissiveIntensity: 0.15
-            });
-            const pMesh = new THREE.Mesh(pGeo, pMat);
-            pMesh.position.x = p.dist;
-            pivot.add(pMesh);
+            const ringGeo = new THREE.TorusGeometry(8.5 + idx * 1.2, 0.05, 16, 90);
+            const ringMat = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.35 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            pivot.add(ring);
 
-            // Saturn 3D Ring System
-            if (p.hasRings && p.name === 'Saturn') {
-                const ringGeo = new THREE.RingGeometry(p.radius * 1.4, p.radius * 2.4, 32);
-                const ringMat = new THREE.MeshBasicMaterial({
-                    color: 0xd4b068,
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    opacity: 0.8
-                });
-                const saturnRing = new THREE.Mesh(ringGeo, ringMat);
-                saturnRing.rotation.x = Math.PI / 2.3;
-                pMesh.add(saturnRing);
-            }
+            const nodeGeo = new THREE.OctahedronGeometry(0.65, 0);
+            const nodeMat = new THREE.MeshBasicMaterial({ color: col, wireframe: true });
+            const nodeMesh = new THREE.Mesh(nodeGeo, nodeMat);
+            nodeMesh.position.x = 8.5 + idx * 1.2;
+            pivot.add(nodeMesh);
 
-            // Uranus Thin Ring
-            if (p.hasRings && p.name === 'Uranus') {
-                const ringGeo = new THREE.RingGeometry(p.radius * 1.3, p.radius * 1.8, 32);
-                const ringMat = new THREE.MeshBasicMaterial({
-                    color: 0x7dd3fc,
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    opacity: 0.5
-                });
-                const uranusRing = new THREE.Mesh(ringGeo, ringMat);
-                uranusRing.rotation.x = Math.PI / 1.8;
-                pMesh.add(uranusRing);
-            }
-
-            // Earth's Orbiting Moon
-            if (p.hasMoon) {
-                const moonPivot = new THREE.Group();
-                pMesh.add(moonPivot);
-
-                const moonGeo = new THREE.SphereGeometry(0.18, 16, 16);
-                const moonMat = new THREE.MeshPhongMaterial({ color: 0xdddddd });
-                const moonMesh = new THREE.Mesh(moonGeo, moonMat);
-                moonMesh.position.x = 1.3;
-                moonPivot.add(moonMesh);
-                pMesh.userData.moonPivot = moonPivot;
-            }
-
-            planetMeshes.push({ pivot, pMesh, speed: p.speed });
+            medicalGroup.add(pivot);
+            scannerNodes.push({ pivot, speed: 0.008 + idx * 0.003 });
         });
 
-        scene.add(solarSystemGroup);
+        scene.add(medicalGroup);
 
-        // 3. DEEP SPACE TWINKLING STARFIELD (2,000 Stars)
-        const starsGeo = new THREE.BufferGeometry();
-        const starCount = 2000;
-        const starPositions = new Float32Array(starCount * 3);
-        const starColors = new Float32Array(starCount * 3);
+        // 4. FLOATING BIO-MEDICAL PARTICLE AURA (1,800 Particles)
+        const pCount = 1800;
+        const pGeo = new THREE.BufferGeometry();
+        const pPositions = new Float32Array(pCount * 3);
+        const pColors = new Float32Array(pCount * 3);
 
-        for (let i = 0; i < starCount; i++) {
-            starPositions[i * 3]     = (Math.random() - 0.5) * 160;
-            starPositions[i * 3 + 1] = (Math.random() - 0.5) * 160;
-            starPositions[i * 3 + 2] = (Math.random() - 0.5) * 160;
+        for (let i = 0; i < pCount; i++) {
+            pPositions[i * 3]     = (Math.random() - 0.5) * 100;
+            pPositions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+            pPositions[i * 3 + 2] = (Math.random() - 0.5) * 100;
 
-            const r = 0.8 + Math.random() * 0.2;
-            const g = 0.8 + Math.random() * 0.2;
-            const b = 0.9 + Math.random() * 0.1;
-            starColors[i * 3]     = r;
-            starColors[i * 3 + 1] = g;
-            starColors[i * 3 + 2] = b;
+            const r = Math.random() < 0.5 ? 0.08 : 0.2;
+            const g = 0.7 + Math.random() * 0.3;
+            const b = 0.7 + Math.random() * 0.3;
+            pColors[i * 3]     = r;
+            pColors[i * 3 + 1] = g;
+            pColors[i * 3 + 2] = b;
         }
 
-        starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-        starsGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+        pGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
 
-        const starsMat = new THREE.PointsMaterial({
-            size: 0.22,
+        const pMat = new THREE.PointsMaterial({
+            size: 0.18,
             vertexColors: true,
             transparent: true,
-            opacity: 0.85
+            opacity: 0.75
         });
-        const starField = new THREE.Points(starsGeo, starsMat);
-        scene.add(starField);
+        const particleMesh = new THREE.Points(pGeo, pMat);
+        scene.add(particleMesh);
 
-        // 4. ANIMATION & INTERACTIVE MOUSE ROTATION
+        // 5. ANIMATION & INTERACTIVE MOUSE ROTATION
         let mouseX = 0, mouseY = 0;
         document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - window.innerWidth / 2) * 0.0003;
-            mouseY = (e.clientY - window.innerHeight / 2) * 0.0003;
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.0004;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.0004;
 
             // 3D Card Tilt Effect
             const card = document.getElementById('intakeCard');
@@ -545,26 +526,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function animate() {
             requestAnimationFrame(animate);
-            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
 
-            // Sun Self-Rotation & Pulsing Corona (Slower, Majestic)
-            sunMesh.rotation.y += 0.001;
-            coronaMesh.rotation.y -= 0.0015;
-            coronaMesh.rotation.z += 0.0008;
+            // Bio-Core Pulse
+            const pulse = 1 + Math.sin(time * 2.5) * 0.05;
+            coreMesh.scale.set(pulse, pulse, pulse);
+            coreMesh.rotation.y = time * 0.25;
+            innerMesh.rotation.x = -time * 0.35;
 
-            // Rotate Planets in Orbit around Sun
-            planetMeshes.forEach(item => {
-                item.pivot.rotation.y += item.speed;
-                item.pMesh.rotation.y += 0.005; // Self axial rotation
-                if (item.pMesh.userData.moonPivot) {
-                    item.pMesh.userData.moonPivot.rotation.y += 0.01;
-                }
+            // DNA Helix Rotation
+            dnaGroup.rotation.y = time * 0.35;
+
+            // Scanner Nodes Orbit
+            scannerNodes.forEach(node => {
+                node.pivot.rotation.y += node.speed;
             });
 
-            // Smooth Solar System Motion reacting to Mouse Cursor
-            solarSystemGroup.rotation.y += 0.0002 + mouseX;
-            solarSystemGroup.rotation.x = 0.35 + mouseY;
-            starField.rotation.y -= 0.0001;
+            // Smooth Motion with Mouse Cursor
+            medicalGroup.rotation.y += 0.002 + mouseX;
+            medicalGroup.rotation.x = mouseY;
+            particleMesh.rotation.y -= 0.0005;
 
             renderer.render(scene, camera);
         }
