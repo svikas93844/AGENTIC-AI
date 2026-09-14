@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +8,15 @@
     <!-- Google Fonts & FontAwesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <!-- Three.js 3D Rendering Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
+
 <body>
 
     <!-- PATIENT INTAKE & COLAB CONNECTION OVERLAY -->
@@ -62,7 +66,7 @@
 
                 <div class="form-group">
                     <label for="intakeColabKey"><i class="fa-solid fa-key"></i> Google Colab Key / Tunnel Link</label>
-                    <input type="text" id="intakeColabKey" placeholder="e.g. https://xxxx.ngrok-free.app or COLAB-KEY-1234" value="" autocomplete="off">
+                    <input type="text" id="intakeColabKey" placeholder="Enter Google Colab Link" value="" autocomplete="off">
                     <small style="color: #94a3b8; font-size: 0.8rem; margin-top: 4px; display: block;">
                         Copy the Tunnel URL or Colab Key generated in your Google Colab cell.
                     </small>
@@ -144,13 +148,15 @@
 
                     <!-- Expanded Symptom Selector -->
                     <div class="form-group">
-                        <label><i class="fa-solid fa-notes-medical"></i> Select Your Symptoms (Check All That Apply)</label>
+                        <label><i class="fa-solid fa-notes-medical"></i> Select Your Symptoms (Check All That
+                            Apply)</label>
                         <p class="sub-label">Select symptoms you are experiencing today:</p>
 
                         <div class="symptom-chips-grid">
                             <label class="symptom-checkbox-card">
                                 <input type="checkbox" value="fever" id="chk-fever">
-                                <span class="chip-content"><i class="fa-solid fa-temperature-high"></i> Fever / Chills</span>
+                                <span class="chip-content"><i class="fa-solid fa-temperature-high"></i> Fever /
+                                    Chills</span>
                             </label>
 
                             <label class="symptom-checkbox-card">
@@ -165,7 +171,8 @@
 
                             <label class="symptom-checkbox-card">
                                 <input type="checkbox" value="cold_runny_nose" id="chk-cold_runny_nose" checked>
-                                <span class="chip-content"><i class="fa-solid fa-snowflake"></i> Cold / Runny Nose</span>
+                                <span class="chip-content"><i class="fa-solid fa-snowflake"></i> Cold / Runny
+                                    Nose</span>
                             </label>
 
                             <label class="symptom-checkbox-card">
@@ -195,12 +202,14 @@
 
                             <label class="symptom-checkbox-card">
                                 <input type="checkbox" value="nausea" id="chk-nausea">
-                                <span class="chip-content"><i class="fa-solid fa-face-grimace"></i> Nausea / Vomiting</span>
+                                <span class="chip-content"><i class="fa-solid fa-face-grimace"></i> Nausea /
+                                    Vomiting</span>
                             </label>
 
                             <label class="symptom-checkbox-card">
                                 <input type="checkbox" value="diarrhea" id="chk-diarrhea">
-                                <span class="chip-content"><i class="fa-solid fa-toilet"></i> Diarrhea / Loose Motion</span>
+                                <span class="chip-content"><i class="fa-solid fa-toilet"></i> Diarrhea / Loose
+                                    Motion</span>
                             </label>
 
                             <label class="symptom-checkbox-card">
@@ -210,12 +219,14 @@
 
                             <label class="symptom-checkbox-card">
                                 <input type="checkbox" value="skin_rash" id="chk-skin_rash">
-                                <span class="chip-content"><i class="fa-solid fa-allergies"></i> Skin Rash / Itching</span>
+                                <span class="chip-content"><i class="fa-solid fa-allergies"></i> Skin Rash /
+                                    Itching</span>
                             </label>
 
                             <label class="symptom-checkbox-card">
                                 <input type="checkbox" value="chest_pain" id="chk-chest_pain">
-                                <span class="chip-content alert-chip"><i class="fa-solid fa-heart-crack"></i> Chest Pain</span>
+                                <span class="chip-content alert-chip"><i class="fa-solid fa-heart-crack"></i> Chest
+                                    Pain</span>
                             </label>
                         </div>
                     </div>
@@ -229,7 +240,8 @@
             <!-- Center Panel: Assessment Result, Home Remedies & Medicine Comparison Table -->
             <section class="panel glass-card center-panel">
                 <div class="panel-header">
-                    <h2><i class="fa-solid fa-house-medical-flag"></i> Health Assessment, Home Remedies & Medicine Guide</h2>
+                    <h2><i class="fa-solid fa-house-medical-flag"></i> Health Assessment, Home Remedies & Medicine Guide
+                    </h2>
                 </div>
 
                 <div class="result-content-wrapper">
@@ -257,7 +269,8 @@
                     <!-- English Medicine vs Natural Medicine Comparison Table -->
                     <div class="medicine-comparison-section" id="medicineComparisonSection">
                         <div class="section-title-bar">
-                            <h3><i class="fa-solid fa-scale-balanced"></i> English Medicine vs. Natural Medicine Comparison</h3>
+                            <h3><i class="fa-solid fa-scale-balanced"></i> English Medicine vs. Natural Medicine
+                                Comparison</h3>
                             <span class="section-subtitle">Side-by-Side Efficacy & Most Effective Treatment Guide</span>
                         </div>
 
@@ -283,7 +296,8 @@
                         <i class="fa-solid fa-user-doctor advice-icon"></i>
                         <div>
                             <strong>Physician Advice:</strong>
-                            <p id="res-doctor-advice">Seek a doctor if fever exceeds 102°F or symptoms persist longer than 7 days.</p>
+                            <p id="res-doctor-advice">Seek a doctor if fever exceeds 102°F or symptoms persist longer
+                                than 7 days.</p>
                         </div>
                     </div>
                 </div>
@@ -324,13 +338,16 @@
                                 <i class="fa-solid fa-robot"></i>
                                 <span>AI Health Assistant</span>
                             </div>
-                            <p>Hello <strong id="chat-patient-name">Sarah Jenkins</strong>! I can answer **ANY question** you have—about your remedies, English vs. Natural medicines, side effects, food diet, or symptom doubts. What would you like to ask?</p>
+                            <p>Hello <strong id="chat-patient-name">Sarah Jenkins</strong>! I can answer **ANY
+                                question** you have—about your remedies, English vs. Natural medicines, side effects,
+                                food diet, or symptom doubts. What would you like to ask?</p>
                         </div>
                     </div>
 
                     <!-- Chat Form Input -->
                     <form id="chatForm" class="chat-input-form">
-                        <input type="text" id="chatInput" placeholder="Ask me anything (e.g. Which is better: Paracetamol or Steam?)..." required>
+                        <input type="text" id="chatInput"
+                            placeholder="Ask me anything (e.g. Which is better: Paracetamol or Steam?)..." required>
                         <button type="submit" class="send-btn">
                             <i class="fa-solid fa-paper-plane"></i> Ask
                         </button>
@@ -342,4 +359,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>
