@@ -362,14 +362,193 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Auto Session Restore
-    const savedSession = localStorage.getItem('agentic_user_session');
-    if (savedSession) {
-        try {
-            const uData = JSON.parse(savedSession);
-            loginUserSession(uData);
-        } catch (e) {
-            // Open auth overlay
+    // ------------------------------------------
+    // 7. THREE.JS 3D SCENE 1: ADMISSION DNA HELIX & MOLECULAR ORB
+    // ------------------------------------------
+    function initAdmission3DScene() {
+        const canvas = document.getElementById('admission3DCanvas');
+        if (!canvas || !window.THREE) return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 25;
+
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Create DNA Double Helix Group
+        const dnaGroup = new THREE.Group();
+        const numPairs = 30;
+        const radius = 4;
+        const heightStep = 0.5;
+
+        const sphereGeo = new THREE.SphereGeometry(0.3, 16, 16);
+        const tealMat = new THREE.MeshBasicMaterial({ color: 0x14b8a6, wireframe: true });
+        const cyanMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9, wireframe: true });
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6 });
+
+        for (let i = 0; i < numPairs; i++) {
+            const angle = i * 0.3;
+            const y = (i - numPairs / 2) * heightStep;
+
+            const x1 = Math.cos(angle) * radius;
+            const z1 = Math.sin(angle) * radius;
+            const s1 = new THREE.Mesh(sphereGeo, tealMat);
+            s1.position.set(x1, y, z1);
+            dnaGroup.add(s1);
+
+            const x2 = Math.cos(angle + Math.PI) * radius;
+            const z2 = Math.sin(angle + Math.PI) * radius;
+            const s2 = new THREE.Mesh(sphereGeo, cyanMat);
+            s2.position.set(x2, y, z2);
+            dnaGroup.add(s2);
+
+            const lineGeo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(x1, y, z1),
+                new THREE.Vector3(x2, y, z2)
+            ]);
+            const rung = new THREE.Line(lineGeo, lineMat);
+            dnaGroup.add(rung);
         }
+
+        scene.add(dnaGroup);
+
+        // Particle Stars Background
+        const particlesGeo = new THREE.BufferGeometry();
+        const pCount = 1200;
+        const posArray = new Float32Array(pCount * 3);
+        for (let i = 0; i < pCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 80;
+        }
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMat = new THREE.PointsMaterial({
+            size: 0.15,
+            color: 0x2dd4bf,
+            transparent: true,
+            opacity: 0.7
+        });
+        const particleMesh = new THREE.Points(particlesGeo, particlesMat);
+        scene.add(particleMesh);
+
+        // Animation Loop & Interactive Mouse Tilt
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.0005;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.0005;
+
+            // 3D Card Tilt Effect
+            const card = document.getElementById('intakeCard');
+            if (card && elements.intakeOverlay.classList.contains('active')) {
+                const tiltX = (e.clientY / window.innerHeight - 0.5) * -15;
+                const tiltY = (e.clientX / window.innerWidth - 0.5) * 15;
+                card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+            }
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            dnaGroup.rotation.y += 0.01 + mouseX;
+            dnaGroup.rotation.x += 0.005 + mouseY;
+            particleMesh.rotation.y -= 0.002;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     }
+
+    // ------------------------------------------
+    // 8. THREE.JS 3D SCENE 2: DASHBOARD HOLOGRAPHIC BIO-HEART MESH
+    // ------------------------------------------
+    function initDashboard3DScene() {
+        const canvas = document.getElementById('dashboard3DCanvas');
+        if (!canvas || !window.THREE) return;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 18;
+
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Create Holographic Bio-Heart Torus Knot Mesh
+        const heartGroup = new THREE.Group();
+        const heartGeo = new THREE.TorusKnotGeometry(4.5, 1.4, 120, 16, 2, 3);
+        const heartMat = new THREE.MeshBasicMaterial({
+            color: 0x0284c7,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.45
+        });
+        const heartMesh = new THREE.Mesh(heartGeo, heartMat);
+        heartGroup.add(heartMesh);
+
+        // Orbiting Energetic Electron Rings
+        const ringGeo1 = new THREE.TorusGeometry(8, 0.08, 16, 100);
+        const ringMat1 = new THREE.MeshBasicMaterial({ color: 0x14b8a6, transparent: true, opacity: 0.7 });
+        const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
+        ring1.rotation.x = Math.PI / 3;
+        heartGroup.add(ring1);
+
+        const ringGeo2 = new THREE.TorusGeometry(9.5, 0.08, 16, 100);
+        const ringMat2 = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.6 });
+        const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+        ring2.rotation.y = Math.PI / 4;
+        heartGroup.add(ring2);
+
+        // Bio-Particle Mesh Wave
+        const pCount = 1500;
+        const pGeo = new THREE.BufferGeometry();
+        const pPositions = new Float32Array(pCount * 3);
+        for (let i = 0; i < pCount * 3; i++) {
+            pPositions[i] = (Math.random() - 0.5) * 60;
+        }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+        const pMat = new THREE.PointsMaterial({
+            size: 0.18,
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.65
+        });
+        const pMesh = new THREE.Points(pGeo, pMat);
+        scene.add(pMesh);
+
+        scene.add(heartGroup);
+
+        // Cardiac Pulse & Animation Loop
+        let clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+
+            // Realistic Cardiac Rhythm Pulse
+            const pulse = 1 + Math.sin(time * 3) * 0.06;
+            heartGroup.scale.set(pulse, pulse, pulse);
+
+            heartMesh.rotation.x = time * 0.3;
+            heartMesh.rotation.y = time * 0.4;
+            ring1.rotation.z = time * 0.5;
+            ring2.rotation.x = time * 0.4;
+            pMesh.rotation.y = time * 0.05;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    }
+
+    // Launch both distinct 3D scenes
+    initAdmission3DScene();
+    initDashboard3DScene();
 });

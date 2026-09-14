@@ -10,12 +10,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <!-- Three.js 3D Rendering Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
     <!-- PATIENT INTAKE & COLAB CONNECTION OVERLAY -->
     <div class="modal-overlay active" id="intakeOverlay">
-        <div class="modal-card glass-card auth-modal">
+        <!-- 3D DNA Double Helix & Neural Molecular Scene for Admission Overlay -->
+        <canvas id="admission3DCanvas" class="overlay-3d-canvas"></canvas>
+
+        <div class="modal-card glass-card auth-modal" id="intakeCard">
             <div class="modal-header">
                 <div class="hospital-brand">
                     <div class="logo-icon">
@@ -74,6 +79,9 @@
 
     <!-- Main App Container -->
     <div class="app-container hidden" id="mainDashboard">
+        <!-- 3D Holographic Bio-Heart & Organ Mesh Background Scene -->
+        <canvas id="dashboard3DCanvas" class="dashboard-3d-bg"></canvas>
+
         <!-- Top Navigation Header -->
         <header class="top-header glass-card">
             <div class="brand">
