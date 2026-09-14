@@ -71,10 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const dobVal = e.target.value;
         const age = calculateAge(dobVal);
         if (dobVal && age >= 0) {
-            elements.intakeAgeBadge.innerText = `Age: ${age} years old`;
+            elements.intakeAgeBadge.innerText = `${age} years old`;
             elements.intakeAgeBadge.style.color = '#14b8a6';
         } else {
-            elements.intakeAgeBadge.innerText = 'Select DOB above';
+            elements.intakeAgeBadge.innerText = '--';
             elements.intakeAgeBadge.style.color = '#94a3b8';
         }
     });
