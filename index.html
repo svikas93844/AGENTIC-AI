@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <form id="intakeForm" class="auth-form active">
+            <form id="intakeForm" class="auth-form active" autocomplete="off">
                 <div class="form-group">
                     <label for="intakeName"><i class="fa-solid fa-user"></i> Patient Full Name</label>
                     <input type="text" id="intakeName" placeholder="e.g. VIKAS S" required>
@@ -62,7 +62,7 @@
 
                 <div class="form-group">
                     <label for="intakeColabKey"><i class="fa-solid fa-key"></i> Google Colab Key / Tunnel Link</label>
-                    <input type="text" id="intakeColabKey" placeholder="e.g. https://xxxx.ngrok-free.app or COLAB-KEY-1234">
+                    <input type="text" id="intakeColabKey" placeholder="e.g. https://xxxx.ngrok-free.app or COLAB-KEY-1234" value="" autocomplete="off">
                     <small style="color: #94a3b8; font-size: 0.8rem; margin-top: 4px; display: block;">
                         Copy the Tunnel URL or Colab Key generated in your Google Colab cell.
                     </small>

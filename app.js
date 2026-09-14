@@ -52,6 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
         chipBtns: document.querySelectorAll('.chip-btn')
     };
 
+    // Guarantee Google Colab Key / Tunnel Link field is strictly blank on page load
+    if (elements.intakeColabKey) {
+        elements.intakeColabKey.value = '';
+    }
+
     // ------------------------------------------
     // 2. AGE AUTO-CALCULATION FROM DOB
     // ------------------------------------------
