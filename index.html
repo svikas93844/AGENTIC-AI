@@ -13,8 +13,68 @@
 </head>
 <body>
 
+    <!-- PATIENT INTAKE & COLAB CONNECTION OVERLAY -->
+    <div class="modal-overlay active" id="intakeOverlay">
+        <div class="modal-card glass-card auth-modal">
+            <div class="modal-header">
+                <div class="hospital-brand">
+                    <div class="logo-icon">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+                    <div>
+                        <h2>PATIENT ADMISSION & COLAB LINK</h2>
+                        <p>Enter patient details & Google Colab Connection Key/Link to proceed</p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="intakeForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="intakeName"><i class="fa-solid fa-user"></i> Patient Full Name</label>
+                    <input type="text" id="intakeName" placeholder="e.g. Sarah Jenkins" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="intakeDob"><i class="fa-solid fa-calendar"></i> Date of Birth (DOB)</label>
+                        <input type="date" id="intakeDob" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="intakeGender"><i class="fa-solid fa-venus-mars"></i> Gender</label>
+                        <select id="intakeGender">
+                            <option value="Female" selected>Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Live Auto-Calculated Age Display -->
+                <div class="age-calc-box" id="intakeAgeBox">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span>Calculated Age:</span>
+                    <strong id="intakeAgeBadge">Select DOB above</strong>
+                </div>
+
+                <div class="form-group">
+                    <label for="intakeColabKey"><i class="fa-solid fa-key"></i> Google Colab Key / Tunnel Link</label>
+                    <input type="text" id="intakeColabKey" placeholder="e.g. https://xxxx.ngrok-free.app or COLAB-KEY-1234" value="http://localhost:8080" required>
+                    <small style="color: #94a3b8; font-size: 0.8rem; margin-top: 4px; display: block;">
+                        Copy the Tunnel URL or Colab Key generated in your Google Colab cell.
+                    </small>
+                </div>
+
+                <div class="auth-msg error-msg" id="intakeErrorMsg" style="display: none;"></div>
+
+                <button type="submit" class="auth-submit-btn">
+                    <i class="fa-solid fa-plug"></i> Connect Colab & Launch Health Monitor
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Main App Container -->
-    <div class="app-container" id="mainDashboard">
+    <div class="app-container hidden" id="mainDashboard">
         <!-- Top Navigation Header -->
         <header class="top-header glass-card">
             <div class="brand">
@@ -25,6 +85,23 @@
                     <h1>AGENTIC-AI MULTI AGENT HEALTH CARE MONITOR</h1>
                     <span class="sub-badge">Symptom Checker, Home Remedies & Medicine Guide</span>
                 </div>
+            </div>
+
+            <!-- Logged Patient & Colab Status Badge -->
+            <div class="user-header-profile" id="userHeaderProfile">
+                <div class="user-avatar">
+                    <i class="fa-solid fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <span class="u-name" id="hdrPatientName">Sarah Jenkins</span>
+                    <span class="u-meta" id="hdrPatientMeta">Age 28 (Female) • DOB: 1998-05-14</span>
+                </div>
+                <div class="colab-status-badge" id="hdrColabBadge">
+                    <i class="fa-solid fa-link"></i> <span id="colabStatusText">Colab Connected</span>
+                </div>
+                <button class="logout-btn" id="changeIntakeBtn" title="Change Patient / Colab Key">
+                    <i class="fa-solid fa-pen-to-square"></i> Change Intake
+                </button>
             </div>
         </header>
 

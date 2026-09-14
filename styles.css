@@ -565,3 +565,196 @@ body {
 .chat-input-form input { flex: 1; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-glass); border-radius: 8px; padding: 9px 12px; color: #fff; font-size: 12px; outline: none; }
 .chat-input-form input:focus { border-color: var(--accent-teal); }
 .send-btn { padding: 9px 14px; background: linear-gradient(135deg, #14b8a6, #0284c7); border: none; border-radius: 8px; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; }
+
+/* Modal Overlay & Patient Intake Form */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(9, 14, 26, 0.85);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.auth-modal {
+    width: 100%;
+    max-width: 480px;
+    padding: 24px;
+    border: 1px solid var(--accent-teal);
+    box-shadow: 0 0 40px rgba(20, 184, 166, 0.25);
+}
+
+.modal-header {
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-glass);
+}
+.hospital-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.hospital-brand .logo-icon {
+    width: 46px;
+    height: 46px;
+    background: linear-gradient(135deg, #14b8a6, #0284c7);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #fff;
+    flex-shrink: 0;
+}
+.hospital-brand h2 {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+}
+.hospital-brand p {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.form-group label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-teal);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.form-group input, .form-group select {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+.form-group input:focus, .form-group select:focus {
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 10px rgba(20, 184, 166, 0.2);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.age-calc-box {
+    background: rgba(20, 184, 166, 0.1);
+    border: 1px dashed var(--accent-teal);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.age-calc-box strong {
+    color: var(--accent-teal);
+    font-weight: 700;
+}
+
+.auth-submit-btn {
+    padding: 12px;
+    background: linear-gradient(135deg, #14b8a6, #0284c7);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(20, 184, 166, 0.35);
+}
+.auth-submit-btn:hover {
+    opacity: 0.95;
+}
+
+/* User Header Profile & Colab Status Badge */
+.user-header-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid var(--border-glass);
+    border-radius: 30px;
+    padding: 6px 14px;
+}
+.user-avatar {
+    font-size: 22px;
+    color: var(--accent-teal);
+}
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+.u-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+}
+.u-meta {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+.colab-status-badge {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid var(--accent-emerald);
+    color: var(--accent-emerald);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.logout-btn {
+    background: rgba(244, 63, 94, 0.15);
+    border: 1px solid var(--accent-rose);
+    color: var(--accent-rose);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.logout-btn:hover {
+    background: rgba(244, 63, 94, 0.3);
+}
+

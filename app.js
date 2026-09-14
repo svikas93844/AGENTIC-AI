@@ -7,14 +7,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------------------------------------------
     // 1. STATE MANAGEMENT
     // ------------------------------------------
+    // ------------------------------------------
+    // 1. STATE & DOM ELEMENTS
+    // ------------------------------------------
     const state = {
-        user: null, // Active logged-in user
+        patient: null,
+        apiBaseUrl: 'http://localhost:8080',
         currentDiagnosis: null
     };
 
-    // DOM Elements
     const elements = {
+        intakeOverlay: document.getElementById('intakeOverlay'),
+        intakeForm: document.getElementById('intakeForm'),
+        intakeName: document.getElementById('intakeName'),
+        intakeDob: document.getElementById('intakeDob'),
+        intakeGender: document.getElementById('intakeGender'),
+        intakeAgeBadge: document.getElementById('intakeAgeBadge'),
+        intakeColabKey: document.getElementById('intakeColabKey'),
+        intakeErrorMsg: document.getElementById('intakeErrorMsg'),
+
         mainDashboard: document.getElementById('mainDashboard'),
+        hdrPatientName: document.getElementById('hdrPatientName'),
+        hdrPatientMeta: document.getElementById('hdrPatientMeta'),
+        colabStatusText: document.getElementById('colabStatusText'),
+        changeIntakeBtn: document.getElementById('changeIntakeBtn'),
+
         symptomForm: document.getElementById('symptomForm'),
         patientNameInput: document.getElementById('patientName'),
         patientAgeInput: document.getElementById('patientAge'),
@@ -36,9 +53,86 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ------------------------------------------
-    // INITIAL DASHBOARD LOAD (DIRECT ACCESS)
+    // 2. AGE AUTO-CALCULATION FROM DOB
     // ------------------------------------------
-    triggerDiagnosis();
+    function calculateAge(dobString) {
+        if (!dobString) return 0;
+        const today = new Date();
+        const birthDate = new Date(dobString);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age > 0 ? age : 0;
+    }
+
+    elements.intakeDob.addEventListener('input', (e) => {
+        const dobVal = e.target.value;
+        const age = calculateAge(dobVal);
+        if (dobVal && age >= 0) {
+            elements.intakeAgeBadge.innerText = `Age: ${age} years old`;
+            elements.intakeAgeBadge.style.color = '#14b8a6';
+        } else {
+            elements.intakeAgeBadge.innerText = 'Select DOB above';
+            elements.intakeAgeBadge.style.color = '#94a3b8';
+        }
+    });
+
+    // ------------------------------------------
+    // 3. PATIENT INTAKE & COLAB LINK SUBMISSION
+    // ------------------------------------------
+    elements.intakeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        elements.intakeErrorMsg.style.display = 'none';
+
+        const name = elements.intakeName.value.trim();
+        const dob = elements.intakeDob.value;
+        const age = calculateAge(dob);
+        const gender = elements.intakeGender.value;
+        let colabKey = elements.intakeColabKey.value.trim();
+
+        if (age <= 0) {
+            elements.intakeErrorMsg.innerText = 'Please select a valid Date of Birth!';
+            elements.intakeErrorMsg.style.display = 'block';
+            return;
+        }
+
+        // Process Colab URL / Key
+        if (colabKey.startsWith('http://') || colabKey.startsWith('https://')) {
+            state.apiBaseUrl = colabKey.replace(/\/+$/, '');
+        } else {
+            state.apiBaseUrl = 'http://localhost:8080';
+        }
+
+        const patientData = { name, dob, age, gender, colabKey };
+        state.patient = patientData;
+        localStorage.setItem('agentic_patient_intake', JSON.stringify(patientData));
+
+        // Update Header Profile Badge
+        elements.hdrPatientName.innerText = name;
+        elements.hdrPatientMeta.innerText = `Age ${age} (${gender}) • DOB: ${dob}`;
+        elements.colabStatusText.innerText = colabKey.includes('http') ? 'Colab Live Connected' : 'Local Connected';
+
+        // Auto-fill Symptom Form
+        elements.patientNameInput.value = name;
+        elements.patientAgeInput.value = age;
+        elements.patientGenderInput.value = gender;
+        if (elements.chatPatientName) elements.chatPatientName.innerText = name;
+
+        // Switch Overlays & Open Dashboard
+        elements.intakeOverlay.classList.remove('active');
+        elements.mainDashboard.classList.remove('hidden');
+
+        // Trigger Diagnosis
+        triggerDiagnosis();
+    });
+
+    // Re-open intake to change patient or colab link
+    elements.changeIntakeBtn.addEventListener('click', () => {
+        elements.mainDashboard.classList.add('hidden');
+        elements.intakeOverlay.classList.add('active');
+    });
 
     // ------------------------------------------
     // 5. SYMPTOM DIAGNOSIS & MEDICINE COMPARISON
@@ -73,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.resPatientTag.innerText = `${name} (Age ${age})`;
 
         try {
-            const res = await fetch('http://localhost:8080/api/diagnose', {
+            const res = await fetch(`${state.apiBaseUrl}/api/diagnose`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ symptoms, age })
@@ -204,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const condition = state.currentDiagnosis ? state.currentDiagnosis.condition_name : 'General Health';
 
         try {
-            const res = await fetch('http://localhost:8080/api/chat', {
+            const res = await fetch(`${state.apiBaseUrl}/api/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
